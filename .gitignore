@@ -3,3 +3,4 @@ secret_key
 *.pyc
 *.swp
 website/local_settings.py
+certs/
