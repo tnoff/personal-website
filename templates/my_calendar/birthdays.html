@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Custom CSS Styles -->
+<style type="text/css">
+</style>
+
+<!-- Main page -->
+<div id="main-page" align="center">
+    <h2>Upcoming Birthdays</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Person</th>
+                <th scope="col">Date</th>
+                <th scope="col">Days Until</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for birthday in birthdays %}
+            <tr>
+                <td>{{birthday.person}}</td>
+                <td>{{birthday.month}} {{birthday.day}}</td>
+                <td>{{birthday.delta.days}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

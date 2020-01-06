@@ -36,10 +36,10 @@ class BirthdayForm(forms.ModelForm):
                 raise forms.ValidationError("Invalid day %s for month %s" % (day, month))
         return day
 
-    def clean_person_id(self):
-        person = self.cleaned_data['person_id']
+    def clean_person(self):
+        person = self.cleaned_data['person']
 
-        existing_birthdays = Birthday.objects.filter(person_id=person.id)
+        existing_birthdays = Birthday.objects.filter(person=person.id)
         if existing_birthdays:
             raise forms.ValidationError("Person %s already has a birthday on record" % person)
         return person

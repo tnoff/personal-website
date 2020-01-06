@@ -112,6 +112,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
+# Login settings
+LOGIN_URL = '/954cc912-5793-462e-b8d8-f018669e0bf6/'
+
 try:
     from website.local_settings import * #pylint:disable=wildcard-import,unused-wildcard-import
 except ImportError:

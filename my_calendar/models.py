@@ -10,7 +10,7 @@ class Person(models.Model):
 class Birthday(models.Model):
     month = models.IntegerField()
     day = models.IntegerField()
-    person_id = models.ForeignKey(Person, on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '%s - %s.%s' % (self.person_id, self.month, self.day)
+        return '%s - %s.%s' % (self.person, self.month, self.day)
