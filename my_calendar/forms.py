@@ -6,15 +6,6 @@ from my_calendar.models import Birthday, Person
 class BirthdayForm(forms.ModelForm):
     month = forms.ChoiceField(choices = MONTHS)
 
-    list_persons = []
-    existing_bdays = set([person.id for person in Birthday.objects.all().only("person")])
-    for person in Person.objects.all():
-        if person.id in existing_bdays:
-            continue
-        list_persons.append((person, person.name))
-
-    person = forms.ChoiceField(choices = list_persons)
-
     class Meta:
         model = Birthday
         fields = '__all__'
