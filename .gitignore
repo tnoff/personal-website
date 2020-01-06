@@ -5,3 +5,4 @@ secret_key
 website/local_settings.py
 certs/
 local_static/
+my.cnf
