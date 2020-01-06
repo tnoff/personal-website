@@ -42,4 +42,4 @@ class BirthdayForm(forms.ModelForm):
         existing_birthdays = Birthday.objects.filter(person_id=person.id)
         if existing_birthdays:
             raise forms.ValidationError("Person %s already has a birthday on record" % person)
-        return person_id
+        return person
