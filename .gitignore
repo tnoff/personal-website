@@ -4,3 +4,4 @@ secret_key
 *.swp
 website/local_settings.py
 certs/
+local_static/
