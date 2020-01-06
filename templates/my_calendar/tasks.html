@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Custom CSS Styles -->
+<style type="text/css">
+</style>
+
+<!-- Main page -->
+<div id="main-page" align="center">
+    <h2>Tasks Due</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Task</th>
+                <th scope="col">Next Due</th>
+                <th scope="col">Days Until</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>{{task.message}}</td>
+                <td>{{task.due_date}}</td>
+                <td>{{task.time_delta.days}}</td>
+                <td>
+                    <form action="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/{{task.id}}/done" method="post">
+                        {% csrf_token %}
+                        <button name="mark_done" value="{{task.id}}" type="submit" class="btn btn-success">Mark Done</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
