@@ -8,19 +8,18 @@ from my_calendar.models import Birthday, Task
 
 @login_required
 def birthdays(request):
-    # TODO change this to date
-    now = datetime.now()
+    now = date.today()
     birthdays = Birthday.objects.all()
 
     # Fix up data a bit
     for birthday in birthdays:
         # Get time delta
-        birthday_datetime = datetime(now.year, birthday.month, birthday.day)
-        birthday.delta = (birthday_datetime - now)
+        birthday_date = date(now.year, birthday.month, birthday.day)
+        birthday.delta = (birthday_date - now)
         # If delta negative, then day has past, so change to next year
         if birthday.delta.days < 0:
-            birthday_datetime = datetime(now.year + 1, birthday.month, birthday.day)
-            birthday.delta = (birthday_datetime - now)
+            birthday_date = date(now.year + 1, birthday.month, birthday.day)
+            birthday.delta = (birthday_date - now)
         # Use readable month
         birthday.month = MONTHS[birthday.month - 1][1]
 
