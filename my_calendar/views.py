@@ -32,11 +32,10 @@ def birthdays(request):
     }
     return render(request, 'my_calendar/birthdays.html', view_data)
 
-def _find_next_due_date(task, start, force_future=False):
-    task.next_due_date = task.due_date
-    task.time_delta = task.next_due_date - start
+def _find_next_due_date(task, start):
+    task.time_delta = task.due_date - start
     # If task is not done, then it is overdue
-    while task.time_delta.days < 0 and (task.marked_done or force_future):
+    while task.time_delta.days < 0:
         # First add month offset
         next_year = task.due_date.year
         next_month = task.due_date.month + task.month_offset
@@ -44,22 +43,22 @@ def _find_next_due_date(task, start, force_future=False):
             next_year += 1
             next_month -= 12
         # Use start date of 1
-        task.next_due_date = date(next_year, next_month, 1)
+        task.due_date = date(next_year, next_month, 1)
         # Go to first day that matches week day
-        while task.next_due_date.weekday() != task.day_of_week:
-            task.next_due_date += timedelta(1)
+        while task.due_date.weekday() != task.day_of_week:
+            task.due_date += timedelta(1)
         # Now add proper week offset
-        task.next_due_date += timedelta(7 * (task.week_offset - 1))
+        task.due_date += timedelta(7 * (task.week_offset - 1))
         # Check again if before todays date
-        task.time_delta = task.next_due_date - start
+        task.time_delta = task.due_date - start
 
 @login_required
 def tasks(request):
     now = date.today()
     tasks = Task.objects.all()
     for task in tasks:
-        _find_next_due_date(task, now)
-        task.due_date = task.next_due_date.strftime("%B %d")
+        task.time_delta = task.due_date - now
+        task.due_date = task.due_date.strftime("%B %d")
     # Sort by time delta
     tasks = sorted(tasks, key=lambda k: k.time_delta)
     view_data = {
@@ -74,8 +73,6 @@ def task_mark_done(request, task_id):
     # First get current due date
     _find_next_due_date(task, now)
     # Then find next due date
-    _find_next_due_date(task, task.next_due_date + timedelta(1), force_future=True)
-    task.due_date = task.next_due_date
-    task.marked_done = False
+    _find_next_due_date(task, task.due_date + timedelta(1))
     task.save()
     return redirect('/0d27c6b9-a5d7-4782-9438-93b54b8f98f8')
