@@ -28,9 +28,6 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/contact/">Contact</a>
-                </li>
                 {% if user.is_superuser %}
                 <li class="nav-item">
                     <a class="nav-link" href="/e37047af-f536-423e-8a72-731cbced13ea/">Birthdays</a>
@@ -40,6 +37,10 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/9af57e02-325f-4e49-af70-9e83518a8539/">Admin Page</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact/">Contact</a>
                 </li>
                 {% endif %}
             </ul>
