@@ -4,30 +4,31 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from my_calendar.constants import MONTHS
-from my_calendar.models import Birthday, Task
+from my_calendar.models import Person, Task
 
 @login_required
 def birthdays(request):
-    now = date.today()
-    birthdays = Birthday.objects.all()
+    today = date.today()
+    persons = Person.objects.order_by('birthday')
 
-    # Fix up data a bit
-    for birthday in birthdays:
-        # Get time delta
-        birthday_date = date(now.year, birthday.month, birthday.day)
-        birthday.delta = (birthday_date - now)
-        # If delta negative, then day has past, so change to next year
-        if birthday.delta.days < 0:
-            birthday_date = date(now.year + 1, birthday.month, birthday.day)
-            birthday.delta = (birthday_date - now)
-        # Use readable month
-        birthday.month = MONTHS[birthday.month - 1][1]
+    append_last = []
+    person_list = []
+    for person in persons:
+        if person.birthday < today:
+            person.birthday = date(today.year + 1, person.birthday.month, person.birthday.day)
+            person.save()
+            person.delta = person.birthday - today
+            person.birthday_string = person.birthday.strftime("%B %d")
+            append_last.append(person)
+            continue
+        person.delta = person.birthday - today
+        person.birthday_string = person.birthday.strftime("%B %d")
+        person_list.append(person)
 
-    # Sort by datetime delta
-    birthdays = sorted(birthdays, key=lambda k: k.delta)
-    # Generate output for view
+    person_list += append_last
+
     view_data = {
-        'birthdays' : birthdays,
+        'persons' : person_list,
     }
     return render(request, 'my_calendar/birthdays.html', view_data)
 
