@@ -19,7 +19,7 @@ class Task(models.Model):
     month_offset = models.IntegerField(blank=False, null=False)
     week_offset = models.IntegerField(blank=False, null=False)
     day_of_week = models.IntegerField(blank=False, null=False)
-    message = models.CharField(max_length=1024, blank=False, null=False)
+    message = models.CharField(max_length=255, blank=False, null=False)
     due_date = models.DateField(blank=False, null=False)
 
     def __str__(self):
