@@ -17,10 +17,6 @@ def birthdays(request):
         if person.birthday < today:
             person.birthday = date(today.year + 1, person.birthday.month, person.birthday.day)
             person.save()
-            person.delta = person.birthday - today
-            person.birthday_string = person.birthday.strftime("%B %d")
-            append_last.append(person)
-            continue
         person.delta = person.birthday - today
         person.birthday_string = person.birthday.strftime("%B %d")
         person_list.append(person)
