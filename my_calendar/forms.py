@@ -12,8 +12,8 @@ class TaskForm(forms.ModelForm):
 
     def clean_month_offset(self):
         month_offset = int(self.cleaned_data['month_offset'])
-        if month_offset < 1:
-            raise forms.ValidationError("Month offset must be positive integer")
+        if month_offset < 0:
+            raise forms.ValidationError("Month offset cannot be a negative integer")
         if month_offset > 6:
             raise forms.ValidationError("Month offset cannot be greater than 6")
         return month_offset

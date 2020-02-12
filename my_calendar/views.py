@@ -38,8 +38,13 @@ def _find_next_due_date(task, start):
         if next_month > 12:
             next_year += 1
             next_month -= 12
-        # Use start date of 1
-        task.due_date = date(next_year, next_month, 1)
+
+        # Use start date of 1 if new month
+        if task.due_date.month != next_month:
+            task.due_date = date(next_year, next_month, 1)
+        # Else just add one to date
+        else:
+            task.due_date += timedelta(1)
         # Go to first day that matches week day
         while task.due_date.weekday() != task.day_of_week:
             task.due_date += timedelta(1)
@@ -66,9 +71,11 @@ def tasks(request):
 def task_mark_done(request, task_id):
     now = date.today()
     task = Task.objects.get(id=task_id)
-    # First get current due date
-    _find_next_due_date(task, now)
-    # Then find next due date
-    _find_next_due_date(task, task.due_date + timedelta(1))
+    # If past due date, use today
+    if task.due_date < now:
+         _find_next_due_date(task, now)
+    # If due date in future, use due date to calculate
+    else:
+        _find_next_due_date(task, task.due_date + timedelta(1))
     task.save()
     return redirect('/0d27c6b9-a5d7-4782-9438-93b54b8f98f8')
