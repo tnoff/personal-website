@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Custom CSS Styles -->
+<style type="text/css">
+    .table {
+        border:none;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    .table tbody td {
+        border-left: 1px solid #000;
+        border-top: 1px solid #000;
+    }
+
+    .table tbody td:first-child {
+        border-left: none;
+    }
+</style>
+
+<!-- Main page -->
+<div id="main-page" align="center">
+    <div class="row">
+        <div class="col">
+            <a href="/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/{{prev_month}}">
+                <button type="button" class="btn btn-secondary">Previous Month</button>
+            </a>
+        </div>
+        <div class="col">
+            <h2>{{calendar_name}}</h2>
+        </div>
+        <div class="col">
+            <a href="/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/{{next_month}}">
+                <button type="button" class="btn btn-secondary">Next Month</button>
+            </a>
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                {% for day_name in days_of_week_names %}
+                <th scope="col">{{day_name}}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for week_row in week_table_rows %}
+            <tr>
+            {% for week_day in week_row %}
+                <td>
+                {% if week_day %}
+                    {% if week_day.is_today %}
+                    <p style="color:red">
+                    {% else %}
+                    <p>
+                    {% endif %}
+                        {{week_day.number}}
+                    </p>
+                    {% for person_name in week_day.birthdays %}
+                        <button type="button" class="btn btn-info" style="width: 100%">{{person_name}}'s Birthday</button>
+                    {% endfor %}
+                    {% for task_message in week_day.tasks %}
+                    <button type="button" class="btn btn-warning" style="width: 100%">{{task_message}}</button>
+                    {% endfor %}
+                {% endif %}
+                </td>
+            {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

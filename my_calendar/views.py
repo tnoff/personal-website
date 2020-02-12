@@ -3,7 +3,7 @@ from datetime import date, datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
-from my_calendar.constants import MONTHS
+from my_calendar.constants import DAYS_OF_WEEK, MONTHS
 from my_calendar.models import Person, Task
 
 @login_required
@@ -79,3 +79,72 @@ def task_mark_done(request, task_id):
         _find_next_due_date(task, task.due_date + timedelta(1))
     task.save()
     return redirect('/0d27c6b9-a5d7-4782-9438-93b54b8f98f8')
+
+class Day():
+    def __init__(self, datetime_date, today):
+        self.number = datetime_date.day
+        self.is_today = (datetime_date == today)
+        self.birthdays = [item.name for item in Person.objects.filter(birthday=datetime_date)]
+        self.tasks = [item.message for item in Task.objects.filter(due_date=datetime_date)]
+
+@login_required
+def calendar(request, year=None, month=None):
+    # Get date from defaults
+    today = date.today()
+    try:
+        year = int(year)
+    except TypeError:
+        year = today.year
+    try:
+        month = int(month)
+    except TypeError:
+        month = today.month
+
+    # Figure out next month, previous month
+    next_month = month + 1
+    next_year = year
+    prev_month = month - 1
+    prev_year = year
+    if next_month == 13:
+        next_year += 1
+        next_month = 1
+    if prev_month == 0:
+        prev_year -= 1
+        prev_month = 12
+
+    # Get days of week names
+    days_of_week_names = [day[1] for day in DAYS_OF_WEEK]
+
+    # List of weeks for table rows
+    week_table_rows = []
+    week_row = []
+
+    # Add empty nodes for first week, so first row starts on first day
+    datetime_day = date(year, month, 1)
+    for _ in range(datetime_day.weekday()):
+        week_row.append(None)
+    # Iterate through all month days
+    while datetime_day.month == month:
+        day_object = Day(datetime_day, today)
+        week_row.append(day_object)
+        if datetime_day.weekday() == 6:
+            week_table_rows.append(week_row)
+            week_row = []
+        datetime_day += timedelta(1)
+    # Check for remaining days, add empty nodes
+    if week_row:
+        for _ in range(7 - datetime_day.weekday()):
+            week_row.append(None)
+        week_table_rows.append(week_row)
+
+
+
+    # Construct all variables
+    view_data = {
+        'calendar_name' : '%s %s' % (MONTHS[month - 1][1], year),
+        'next_month' : '%s/%s' % (next_year, next_month),
+        'prev_month' : '%s/%s' % (prev_year, prev_month),
+        'days_of_week_names' : days_of_week_names,
+        'week_table_rows' : week_table_rows,
+    }
+    return render(request, 'my_calendar/calendar.html', view_data)
