@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Custom CSS Styles -->
+<style type="text/css">
+    .done-button {
+        padding-top: 10px;
+    }
+</style>
+
+<h1>{{task.message}}</h2>
+<div align="left">
+    <h3>Due on {{task.due_date}}, which is in {{task.time_delta.days}} day(s).</h3>
+    <h3>Repeats every {{task.month_offset}} months, on the {{task.week_offset}} week, on {{day_of_week}}.</h3>
+</div>
+<div class="done-button">
+    <a href="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/{{task.id}}/done">
+        <button class="btn btn-success btn-lg">Mark Done</button>
+    </a>
+</div>
+{% endblock %}

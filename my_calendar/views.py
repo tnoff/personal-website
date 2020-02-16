@@ -45,7 +45,7 @@ class Day():
         self.number = datetime_date.day
         self.is_today = (datetime_date == today)
         self.birthdays = [item.name for item in Person.objects.filter(birthday=datetime_date)]
-        self.tasks = [item.message for item in Task.objects.filter(due_date=datetime_date)]
+        self.tasks = [item for item in Task.objects.filter(due_date=datetime_date)]
 
 
 @login_required
@@ -81,6 +81,21 @@ def tasks(request):
         'tasks' : tasks
     }
     return render(request, 'my_calendar/tasks.html', view_data)
+
+@login_required
+def task_show(request, task_id):
+    now = date.today()
+    task = Task.objects.get(id=task_id)
+    task.time_delta = task.due_date - now
+    task.due_date = task.due_date.strftime("%B %d")
+
+    day_of_week = DAYS_OF_WEEK[task.day_of_week][1]
+
+    view_data = {
+        'task' : task,
+        'day_of_week' : day_of_week,
+    }
+    return render(request, 'my_calendar/task_show.html', view_data)
 
 @login_required
 def task_mark_done(request, task_id):

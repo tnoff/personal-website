@@ -56,8 +56,10 @@
                 {% for person_name in week_day.birthdays %}
                     <button class="btn btn-info wide">{{person_name}}'s Birthday</button>
                 {% endfor %}
-                {% for task_message in week_day.tasks %}
-                    <button class="btn btn-warning wide">{{task_message}}</button>
+                {% for task in week_day.tasks %}
+                    <a href="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/{{task.id}}">
+                        <button class="btn btn-warning wide">{{task.message}}</button>
+                    </a>
                 {% endfor %}
             {% endif %}
             </td>
