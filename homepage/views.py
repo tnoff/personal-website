@@ -5,3 +5,6 @@ def home_page(request):
 
 def contact(request):
     return render(request, 'homepage/contact.html')
+
+def resume(request):
+    return render(request, 'homepage/resume.html')
