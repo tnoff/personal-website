@@ -69,7 +69,7 @@ def birthdays(request):
     return render(request, 'my_calendar/birthdays.html', view_data)
 
 @login_required
-def tasks(request):
+def task_list(request):
     now = date.today()
     tasks = Task.objects.all()
     for task in tasks:
@@ -80,7 +80,7 @@ def tasks(request):
     view_data = {
         'tasks' : tasks
     }
-    return render(request, 'my_calendar/tasks.html', view_data)
+    return render(request, 'my_calendar/task_list.html', view_data)
 
 @login_required
 def task_show(request, task_id):
