@@ -109,6 +109,8 @@ def calendar(request, year=None, month=None):
     except TypeError:
         month = today.month
 
+    is_current_month = ((month == today.month) and (year == today.year))
+
     # Figure out next month, previous month
     next_month = month + 1
     next_year = year
@@ -155,5 +157,6 @@ def calendar(request, year=None, month=None):
         'prev_month' : '%s/%s' % (prev_year, prev_month),
         'days_of_week_names' : days_of_week_names,
         'week_table_rows' : week_table_rows,
+        'is_current_month' : is_current_month,
     }
     return render(request, 'my_calendar/calendar.html', view_data)
