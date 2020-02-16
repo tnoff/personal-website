@@ -6,27 +6,13 @@ from django.shortcuts import redirect, render
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
 from my_calendar.models import Person, Task
 
-@login_required
-def birthdays(request):
-    today = date.today()
-    persons = Person.objects.order_by('birthday')
-
-    append_last = []
-    person_list = []
-    for person in persons:
-        if person.birthday < today:
-            person.birthday = date(today.year + 1, person.birthday.month, person.birthday.day)
-            person.save()
-        person.delta = person.birthday - today
-        person.birthday_string = person.birthday.strftime("%B %d")
-        person_list.append(person)
-
-    person_list += append_last
-
-    view_data = {
-        'persons' : person_list,
-    }
-    return render(request, 'my_calendar/birthdays.html', view_data)
+def _update_past_birthdays(today=None):
+    if today is None:
+        today = date.today()
+    past_bdays = Person.objects.filter(birthday__lt=today)
+    for person in past_bdays:
+        person.birthday = date(today.year + 1, person.birthday.month, person.birthday.day)
+        person.save()
 
 def _find_next_due_date(task, start):
     task.time_delta = task.due_date - start
@@ -52,6 +38,35 @@ def _find_next_due_date(task, start):
         task.due_date += timedelta(7 * (task.week_offset - 1))
         # Check again if before todays date
         task.time_delta = task.due_date - start
+
+
+class Day():
+    def __init__(self, datetime_date, today):
+        self.number = datetime_date.day
+        self.is_today = (datetime_date == today)
+        self.birthdays = [item.name for item in Person.objects.filter(birthday=datetime_date)]
+        self.tasks = [item.message for item in Task.objects.filter(due_date=datetime_date)]
+
+
+@login_required
+def birthdays(request):
+    today = date.today()
+    _update_past_birthdays(today=today)
+    persons = Person.objects.order_by('birthday')
+
+    append_last = []
+    person_list = []
+    for person in persons:
+        person.delta = person.birthday - today
+        person.birthday_string = person.birthday.strftime("%B %d")
+        person_list.append(person)
+
+    person_list += append_last
+
+    view_data = {
+        'persons' : person_list,
+    }
+    return render(request, 'my_calendar/birthdays.html', view_data)
 
 @login_required
 def tasks(request):
@@ -80,17 +95,11 @@ def task_mark_done(request, task_id):
     task.save()
     return redirect('/0d27c6b9-a5d7-4782-9438-93b54b8f98f8')
 
-class Day():
-    def __init__(self, datetime_date, today):
-        self.number = datetime_date.day
-        self.is_today = (datetime_date == today)
-        self.birthdays = [item.name for item in Person.objects.filter(birthday=datetime_date)]
-        self.tasks = [item.message for item in Task.objects.filter(due_date=datetime_date)]
-
 @login_required
 def calendar(request, year=None, month=None):
     # Get date from defaults
     today = date.today()
+    _update_past_birthdays(today=today)
     try:
         year = int(year)
     except TypeError:
