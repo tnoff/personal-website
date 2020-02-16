@@ -11,19 +11,15 @@
     <!-- Custom CSS Styles -->
     <style type="text/css">
         body {
-            background-color: #C1DAD6;
-        }
-        nav {
             background-color: #F5FAFA;
         }
 
-        #headshot {
-            width: 25%;
-            height: auto;
-            padding-bottom: 15px;
+        nav {
+            background-color: #ACD1E9;
         }
-        #top-banner {
-            padding-bottom: 15px;
+
+        #main-page {
+            padding-top: 10px;
         }
     </style>
 
@@ -59,8 +55,10 @@
         </nav>
 
         <!-- Main content block -->
+        <div id="main-page" align="center">
         {% block content %}
         {% endblock %}
+        </div>
     </body>
 
 

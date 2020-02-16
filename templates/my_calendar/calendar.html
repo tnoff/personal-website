@@ -23,51 +23,49 @@
 </style>
 
 <!-- Main page -->
-<div id="main-page" align="center">
-    <div class="row">
-        <div class="col">
-            <a href="/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/{{prev_month}}">
-                <button class="btn btn-secondary">Previous Month</button>
-            </a>
-        </div>
-        <div class="col">
-            <h2>{{calendar_name}}</h2>
-        </div>
-        <div class="col">
-            <a href="/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/{{next_month}}">
-                <button class="btn btn-secondary">Next Month</button>
-            </a>
-        </div>
+<div class="row">
+    <div class="col">
+        <a href="/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/{{prev_month}}">
+            <button class="btn btn-secondary">Previous Month</button>
+        </a>
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                {% for day_name in days_of_week_names %}
-                <th scope="col">{{day_name}}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for week_row in week_table_rows %}
-            <tr>
-            {% for week_day in week_row %}
-                <td>
-                {% if week_day %}
-                    <p class="day-number">{{week_day.number}}</p>
-                    {% for person_name in week_day.birthdays %}
-                        <button class="btn btn-info wide">{{person_name}}'s Birthday</button>
-                    {% endfor %}
-                    {% for task_message in week_day.tasks %}
-                        <button class="btn btn-warning wide">{{task_message}}</button>
-                    {% endfor %}
-                {% endif %}
-                </td>
-            {% endfor %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="col">
+        <h2>{{calendar_name}}</h2>
+    </div>
+    <div class="col">
+        <a href="/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/{{next_month}}">
+            <button class="btn btn-secondary">Next Month</button>
+        </a>
+    </div>
 </div>
+<table class="table">
+    <thead>
+        <tr>
+            {% for day_name in days_of_week_names %}
+            <th scope="col">{{day_name}}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for week_row in week_table_rows %}
+        <tr>
+        {% for week_day in week_row %}
+            <td>
+            {% if week_day %}
+                <p class="day-number">{{week_day.number}}</p>
+                {% for person_name in week_day.birthdays %}
+                    <button class="btn btn-info wide">{{person_name}}'s Birthday</button>
+                {% endfor %}
+                {% for task_message in week_day.tasks %}
+                    <button class="btn btn-warning wide">{{task_message}}</button>
+                {% endfor %}
+            {% endif %}
+            </td>
+        {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 {% if is_current_month %}
 <!-- Change todays day to red text -->
