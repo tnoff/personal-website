@@ -21,6 +21,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Two-factor auth apps
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'two_factor',
     # Custom apps
     'homepage',
     'my_calendar',
@@ -32,6 +37,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -110,7 +116,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Login settings
-LOGIN_URL = '/954cc912-5793-462e-b8d8-f018669e0bf6/'
+LOGIN_URL = 'two_factor:login'
+LOGIN_REDIRECT_URL = 'two_factor:profile'
+#LOGIN_URL = '/954cc912-5793-462e-b8d8-f018669e0bf6/'
+#LOGIN_REDIRECT_URL = '/954cc912-5793-462e-b8d8-f018669e0bf6/'
+TWO_FACTOR_QR_FACTORY = 'qrcode.image.pil.PilImage'
+# TWO_FACTOR_PATCH_ADMIN = False
 
 try:
     from website.local_settings import * #pylint:disable=wildcard-import,unused-wildcard-import

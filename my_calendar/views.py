@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django_otp.decorators import otp_required
 
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
 from my_calendar.models import Person, Task
@@ -48,7 +49,7 @@ class Day():
         self.tasks = [item for item in Task.objects.filter(due_date=datetime_date)]
 
 
-@login_required
+@otp_required
 def birthdays(request):
     today = date.today()
     _update_past_birthdays(today=today)
@@ -68,7 +69,7 @@ def birthdays(request):
     }
     return render(request, 'my_calendar/birthdays.html', view_data)
 
-@login_required
+@otp_required
 def task_list(request):
     now = date.today()
     tasks = Task.objects.all()
@@ -82,7 +83,7 @@ def task_list(request):
     }
     return render(request, 'my_calendar/task_list.html', view_data)
 
-@login_required
+@otp_required
 def task_show(request, task_id):
     now = date.today()
     task = Task.objects.get(id=task_id)
@@ -97,7 +98,7 @@ def task_show(request, task_id):
     }
     return render(request, 'my_calendar/task_show.html', view_data)
 
-@login_required
+@otp_required
 def task_mark_done(request, task_id):
     now = date.today()
     task = Task.objects.get(id=task_id)
@@ -110,7 +111,7 @@ def task_mark_done(request, task_id):
     task.save()
     return redirect('/0d27c6b9-a5d7-4782-9438-93b54b8f98f8')
 
-@login_required
+@otp_required
 def calendar(request, year=None, month=None):
     # Get date from defaults
     today = date.today()
