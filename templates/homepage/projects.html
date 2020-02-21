@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" align="left">
+    <h2 align="center">Hathor Podcast Manager</h2>
+    <hr>
+    <p>Hathor is a python package and command line tool that can be used to download and manage media files from RSS Feeds, Souncloud Channels/Profiles, and Youtube Channels.</p>
+    <p>The package includes two command line scripts:</p>
+    <ul>
+        <li>hathor: CLI Script for Hathor package</li>
+        <li>audio-tool: A small cli that can edit audio file metadata</li>
+    </ul>
+    <p>Data from hathor is stored in a SQLITE datbase, where a "podcast" configuration will contain the following:</p>
+    <ul>
+        <li>Name: Internal reference name given to the podcast
+        <li>Arhive type: Either an RSS feed, Soundcloud Channel, or Youtube Channel</li>
+        <li>Broadcast ID: The identifier of the podcast feed.</li>
+    </ul>
+    <p>Once hathor has this data for a given podcast, a sync can be run to gather the latest "episodes", and download them if requested. When a given episode is downloaded, hathor can also configure the audio metadata for the file.</p>
+    <p>In addition, plugins can be added to hathor, which can be configured to run after any function found in the main client.py code.</p>
+    <p>You can view and download the source code on <a href="https://github.com/tnoff/hathor">github</a>.</p>
+
+    <h2 align="center">Backup Tool</h2>
+    <hr>
+    <p>Backup Tool is a python package and command line tool that can be used to encyrpt and backup local files to <a href="https://docs.cloud.oracle.com/en-us/iaas/Content/Object/Concepts/objectstorageoverview.htm">Oracle Cloud Infrastructures Object Storage</a>. Once backed up to OCI Object Storage, files can also be downloaded and decrypted to restore local copies of files.</p>
+    <p>Backup Tool uses a basic AES encryption method with a password of 16 ( or a multiple of 16 ) characters in length. Files are encrypted before they are uploaded to OCI Object Storage to be backed up, and local md5 sums of the original file and the encrypted file are stored in a local SQLITE database.</p>
+    <p>Encrypted files can then be downloaded, and decrypted using the same password. Backup tool will verify the downloaded file and the decrypted files md5 sum against what was saved in the database.</p>
+    <p>You can view and download the source code on <a href="https://github.com/tnoff/backup-tool">github</a>.</p>
+</div>
+{% endblock %}

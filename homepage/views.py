@@ -8,3 +8,6 @@ def contact(request):
 
 def resume(request):
     return render(request, 'homepage/resume.html')
+
+def projects(request):
+    return render(request, 'homepage/projects.html')
