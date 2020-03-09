@@ -3,6 +3,8 @@ from django.db import models
 class Person(models.Model):
     name = models.CharField(max_length=255, unique=True, blank=False, null=False)
     birthday = models.DateField(blank=True, null=True)
+    phone_number = models.CharField(max_length=32)
+
     def __str__(self):
         return self.name
 

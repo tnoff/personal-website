@@ -50,24 +50,28 @@ class Day():
 
 
 @otp_required
-def birthdays(request):
+def persons(request):
     today = date.today()
     _update_past_birthdays(today=today)
     persons = Person.objects.order_by('birthday')
 
-    append_last = []
     person_list = []
     for person in persons:
         person.delta = person.birthday - today
         person.birthday_string = person.birthday.strftime("%B %d")
-        person_list.append(person)
+        if person.phone_number:
+            phone_number_string = '+%s (%s) %s-%s' % (person.phone_number[:-10],
+                                                      person.phone_number[-10:-7],
+                                                      person.phone_number[-7:-4],
+                                                      person.phone_number[-4:])
 
-    person_list += append_last
+            person.phone_number = phone_number_string
+        person_list.append(person)
 
     view_data = {
         'persons' : person_list,
     }
-    return render(request, 'my_calendar/birthdays.html', view_data)
+    return render(request, 'my_calendar/persons.html', view_data)
 
 @otp_required
 def task_list(request):

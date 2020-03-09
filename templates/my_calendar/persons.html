@@ -6,20 +6,22 @@
 </style>
 
 <!-- Main page -->
-<h2>Upcoming Birthdays</h2>
+<h2>Persons</h2>
 
 <table class="table">
     <thead>
         <tr>
             <th scope="col">Person</th>
-            <th scope="col">Date</th>
-            <th scope="col">Days Until</th>
+            <th scope="col">Phone Number</th>
+            <th scope="col">Birthday</th>
+            <th scope="col">Days Until Birthday</th>
         </tr>
     </thead>
     <tbody>
         {% for person in persons %}
         <tr>
             <td>{{person.name}}</td>
+            <td>{{person.phone_number}}</td>
             <td>{{person.birthday_string}}</td>
             <td>{{person.delta.days}}</td>
         </tr>

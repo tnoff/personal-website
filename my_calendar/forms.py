@@ -1,7 +1,25 @@
+import re
+
 from django import forms
 
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
-from my_calendar.models import Task
+from my_calendar.models import Person, Task
+
+# https://stackoverflow.com/questions/16699007/regular-expression-to-match-standard-10-digit-phone-number
+PHONE_NUMBER_REGEX = '^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$'
+
+class PersonForm(forms.ModelForm):
+    class Meta:
+        model = Person
+        fields = '__all__'
+
+    def clean_phone_number(self):
+        matcher = re.match(PHONE_NUMBER_REGEX, self.cleaned_data['phone_number'])
+        if not matcher:
+            raise forms.ValidationError("Invalid number, does not match regex %s" % PHONE_NUMBER_REGEX)
+        return self.cleaned_data['phone_number'].replace('(', '').replace(')', '').\
+                replace('+', '').replace(' ', '').replace('.', '').replace('-', '').strip()
+
 
 class TaskForm(forms.ModelForm):
     day_of_week = forms.ChoiceField(choices = DAYS_OF_WEEK)
