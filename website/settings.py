@@ -82,22 +82,36 @@ DATABASES = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt': "%Y-%m-%d %H:%M:%S"
+        },
+    },
     'handlers': {
-        'website': {
-            'level': 'DEBUG',
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'default'
+        },
+        'rotated_logs': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'formatter': 'verbose',
             'filename': '/var/log/website/website.log',
-            'maxBytes': 1024 * 1024 * 100,  # 100 mb
-        }
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'default'
+            'level': 'DEBUG',
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['website'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
+            'handlers': ['console', 'rotated_logs'],
+            'propagate': True,
+            'level': 'DEBUG',
         },
-    },
+    }
 }
+
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
