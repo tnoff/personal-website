@@ -99,7 +99,7 @@ LOGGING = {
             'filename': '/var/log/website/website.log',
             'maxBytes': 1024 * 1024 * 5,  # 5 MB
             'backupCount': 5,
-            'formatter': 'default'
+            'formatter': 'default',
             'level': 'DEBUG',
         },
     },
