@@ -78,33 +78,26 @@ DATABASES = {
 }
 
 # Logging
-# https://stackoverflow.com/questions/21943962/how-to-see-details-of-django-errors-with-gunicorn
+# https://docs.djangoproject.com/en/3.0/topics/logging/
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
-    'formatters': {
-        'verbose': {
-            'format': '%(asctime)s %(levelname)s %(message)s'
-        }
-    },
+    'disable_existing_loggers': False,
     'handlers': {
-        'gunicorn': {
+        'website': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'verbose',
-            'filename': '/var/log/gunicorn/gunicorn.log',
+            'filename': '/var/log/website/website.log',
             'maxBytes': 1024 * 1024 * 100,  # 100 mb
         }
     },
     'loggers': {
-        'gunicorn.errors': {
-            'level': 'DEBUG',
-            'handlers': ['gunicorn'],
-            'propagate': True,
+        'django': {
+            'handlers': ['website'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
         },
-    }
+    },
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
