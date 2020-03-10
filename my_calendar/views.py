@@ -57,8 +57,9 @@ def persons(request):
 
     person_list = []
     for person in persons:
-        person.delta = person.birthday - today
-        person.birthday_string = person.birthday.strftime("%B %d")
+        if person.birthday:
+            person.delta = person.birthday - today
+            person.birthday_string = person.birthday.strftime("%B %d")
         if person.phone_number:
             phone_number_string = '+%s (%s) %s-%s' % (person.phone_number[:-10],
                                                       person.phone_number[-10:-7],
