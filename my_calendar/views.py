@@ -80,7 +80,7 @@ def task_list(request):
     tasks = Task.objects.all()
     for task in tasks:
         task.time_delta = task.due_date - now
-        task.due_date = task.due_date.strftime("%B %d")
+        task.due_date_no_year = task.due_date.strftime("%B %d")
     # Sort by time delta
     tasks = sorted(tasks, key=lambda k: k.time_delta)
     view_data = {
