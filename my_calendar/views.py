@@ -70,8 +70,9 @@ def persons(request):
             person.phone_number = phone_number_string
         # Keep this last so the folks with no bdays go in the append last list
         if person.birthday:
-            person.delta = person.birthday - today
             person.birthday_string = person.birthday.strftime("%B %d")
+            # Fix up how its presented so javascript can read it
+            person.birthday = person.birthday.strftime("%B %d, %Y")
             person_list.append(person)
         else:
             append_last.append(person)

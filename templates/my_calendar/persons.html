@@ -27,9 +27,26 @@
             {% endif %}
             </td>
             <td>{{person.birthday_string}}</td>
-            <td>{{person.delta.days}}</td>
+            {% if person.birthday %}
+            <td class="timeDelta" birthday-date="{{person.birthday}}"></td>
+            {% else %}
+            <td></td>
+            {% endif %}
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
+<!-- Get date delta for days left !-->
+<script>
+var one_day=1000*60*60*24;
+var today = new Date().getTime();
+var all_bday_deltas = document.getElementsByClassName("timeDelta");
+for (var i = 0; i < all_bday_deltas.length; i++) {
+    var bday_date = new Date(all_bday_deltas[i].getAttribute("birthday-date")).getTime();
+    var difference_ms = bday_date - today;
+    var diff_days = Math.round(difference_ms/one_day) + 1;
+    all_bday_deltas[i].textContent = diff_days;
+}
+</script>
 {% endblock %}
