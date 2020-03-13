@@ -14,6 +14,8 @@ class PersonForm(forms.ModelForm):
         fields = '__all__'
 
     def clean_phone_number(self):
+        if self.cleaned_data['phone_number'] is None:
+            return
         matcher = re.match(PHONE_NUMBER_REGEX, self.cleaned_data['phone_number'])
         if not matcher:
             raise forms.ValidationError("Invalid number, does not match regex %s" % PHONE_NUMBER_REGEX)

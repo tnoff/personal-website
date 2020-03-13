@@ -21,7 +21,11 @@
         {% for person in persons %}
         <tr>
             <td>{{person.name}}</td>
-            <td>{{person.phone_number}}</td>
+            <td>
+            {% if person.phone_number %}
+                {{person.phone_number}}
+            {% endif %}
+            </td>
             <td>{{person.birthday_string}}</td>
             <td>{{person.delta.days}}</td>
         </tr>
