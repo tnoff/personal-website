@@ -56,6 +56,7 @@ def persons(request):
     persons = Person.objects.order_by('birthday')
 
     person_list = []
+    append_last = []
     for person in persons:
         if person.birthday:
             person.delta = person.birthday - today
@@ -67,7 +68,15 @@ def persons(request):
                                                       person.phone_number[-4:])
 
             person.phone_number = phone_number_string
-        person_list.append(person)
+        # Keep this last so the folks with no bdays go in the append last list
+        if person.birthday:
+            person.delta = person.birthday - today
+            person.birthday_string = person.birthday.strftime("%B %d")
+            person_list.append(person)
+        else:
+            append_last.append(person)
+
+    person_list.extend(append_last)
 
     view_data = {
         'persons' : person_list,
