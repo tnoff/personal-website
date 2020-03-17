@@ -4,16 +4,16 @@
 <!-- Custom CSS Styles -->
 <style type="text/css">
     .table {
-        border:none;
+        border: none;
         border-collapse: collapse;
         table-layout: fixed;
     }
-
+    .table tbody tr {
+        border-bottom: 2px solid #000;
+    }
     .table tbody td {
         border-left: 1px solid #000;
-        border-top: 1px solid #000;
     }
-
     .table tbody td:first-child {
         border-left: none;
     }
@@ -22,7 +22,7 @@
     }
 </style>
 
-<!-- Main page -->
+<!-- Top month selector -->
 <div class="row">
     <div class="col">
         <a href="/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/{{prev_month}}">
@@ -38,7 +38,10 @@
         </a>
     </div>
 </div>
+
+<!-- Table with date info -->
 <table class="table">
+    <!-- Thead with days of week -->
     <thead>
         <tr>
             {% for day_name in days_of_week_names %}
@@ -46,16 +49,24 @@
             {% endfor %}
         </tr>
     </thead>
+
+    <!-- Body with days of week -->
     <tbody>
+        {# Every row matches up to a week #}
         {% for week_row in week_table_rows %}
         <tr>
+        {# Every column matches to day #}
         {% for week_day in week_row %}
             <td>
+            {# If day is none, skip with empty column#}
             {% if week_day %}
+                {# Show day number #}
                 <p class="day-number">{{week_day.number}}</p>
+                {# Iterate through birthdays #}
                 {% for person_name in week_day.birthdays %}
                     <button class="btn btn-info wide">{{person_name}}'s Birthday</button>
                 {% endfor %}
+                {# Iterate through tasks #}
                 {% for task in week_day.tasks %}
                     <a href="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/{{task.id}}">
                         <button class="btn btn-warning wide">{{task.message}}</button>
