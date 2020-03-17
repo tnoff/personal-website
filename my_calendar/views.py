@@ -9,10 +9,14 @@ from my_calendar.models import Person, Task
 
 JAVASCRIPT_DATE_FORMAT = "%B %d, %Y"
 
-def _update_past_birthdays(today=None):
+def _update_past_birthdays(today=None, delta=31):
+    '''
+    Today: Current date, can be passed in
+    Delta: Offset when to rotate birthdays
+    '''
     if today is None:
         today = date.today()
-    past_bdays = Person.objects.filter(birthday__lt=today)
+    past_bdays = Person.objects.filter(birthday__lt=(today - timedelta(delta)))
     for person in past_bdays:
         person.birthday = date(today.year + 1, person.birthday.month, person.birthday.day)
         person.save()
@@ -53,6 +57,9 @@ class Day():
 
 @otp_required
 def persons(request):
+    '''
+    Show all persons with phone numbers and birthdays
+    '''
     today = date.today()
     _update_past_birthdays(today=today)
     persons = Person.objects.order_by('birthday')
@@ -88,6 +95,9 @@ def persons(request):
 
 @otp_required
 def task_list(request):
+    '''
+    Show tasks as a sorted list
+    '''
     now = date.today()
     tasks = Task.objects.all()
     for task in tasks:
@@ -102,6 +112,9 @@ def task_list(request):
 
 @otp_required
 def task_show(request, task_id):
+    '''
+    Show individual task
+    '''
     now = date.today()
     task = Task.objects.get(id=task_id)
     task.time_delta = task.due_date - now
@@ -117,6 +130,9 @@ def task_show(request, task_id):
 
 @otp_required
 def task_mark_done(request, task_id):
+    '''
+    API call to mark task as done
+    '''
     now = date.today()
     task = Task.objects.get(id=task_id)
     # If past due date, use today
@@ -130,6 +146,9 @@ def task_mark_done(request, task_id):
 
 @otp_required
 def calendar(request, year=None, month=None):
+    '''
+    Calednar view with birthdays and tasks
+    '''
     # Get date from defaults
     today = date.today()
     _update_past_birthdays(today=today)
@@ -141,8 +160,6 @@ def calendar(request, year=None, month=None):
         month = int(month)
     except TypeError:
         month = today.month
-
-    is_current_month = ((month == today.month) and (year == today.year))
 
     # Figure out next month, previous month
     next_month = month + 1
@@ -190,6 +207,5 @@ def calendar(request, year=None, month=None):
         'prev_month' : '%s/%s' % (prev_year, prev_month),
         'days_of_week_names' : days_of_week_names,
         'week_table_rows' : week_table_rows,
-        'is_current_month' : is_current_month,
     }
     return render(request, 'my_calendar/calendar.html', view_data)
