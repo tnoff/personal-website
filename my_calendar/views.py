@@ -71,10 +71,10 @@ def persons(request):
             person.delta = person.birthday - today
             person.birthday_string = person.birthday.strftime("%B %d")
         if person.phone_number:
-            phone_number_string = '+%s (%s) %s-%s' % (person.phone_number[:-10],
-                                                      person.phone_number[-10:-7],
-                                                      person.phone_number[-7:-4],
-                                                      person.phone_number[-4:])
+            phone_number_string = '%s (%s) %s-%s' % (person.phone_number[:-10],
+                                                     person.phone_number[-10:-7],
+                                                     person.phone_number[-7:-4],
+                                                     person.phone_number[-4:])
 
             person.phone_number = phone_number_string
         # Keep this last so the folks with no bdays go in the append last list
