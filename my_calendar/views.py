@@ -7,6 +7,8 @@ from django_otp.decorators import otp_required
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
 from my_calendar.models import Person, Task
 
+JAVASCRIPT_DATE_FORMAT = "%B %d, %Y"
+
 def _update_past_birthdays(today=None):
     if today is None:
         today = date.today()
@@ -43,8 +45,8 @@ def _find_next_due_date(task, start):
 
 class Day():
     def __init__(self, datetime_date, today):
-        self.number = datetime_date.day
-        self.is_today = (datetime_date == today)
+        self.datetime_date = datetime_date
+        self.datetime_string = datetime_date.strftime(JAVASCRIPT_DATE_FORMAT)
         self.birthdays = [item.name for item in Person.objects.filter(birthday=datetime_date)]
         self.tasks = [item for item in Task.objects.filter(due_date=datetime_date)]
 
@@ -72,7 +74,7 @@ def persons(request):
         if person.birthday:
             person.birthday_string = person.birthday.strftime("%B %d")
             # Fix up how its presented so javascript can read it
-            person.birthday = person.birthday.strftime("%B %d, %Y")
+            person.birthday = person.birthday.strftime(JAVASCRIPT_DATE_FORMAT)
             person_list.append(person)
         else:
             append_last.append(person)
