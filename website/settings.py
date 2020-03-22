@@ -153,10 +153,7 @@ STATIC_URL = '/static/'
 # Login settings
 LOGIN_URL = 'two_factor:login'
 LOGIN_REDIRECT_URL = 'two_factor:profile'
-#LOGIN_URL = '/954cc912-5793-462e-b8d8-f018669e0bf6/'
-#LOGIN_REDIRECT_URL = '/954cc912-5793-462e-b8d8-f018669e0bf6/'
 TWO_FACTOR_QR_FACTORY = 'qrcode.image.pil.PilImage'
-# TWO_FACTOR_PATCH_ADMIN = False
 
 try:
     from website.local_settings import * #pylint:disable=wildcard-import,unused-wildcard-import
