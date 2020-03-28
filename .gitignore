@@ -1,8 +1,7 @@
 *.sqlite3
-secret_key
 *.pyc
 *.swp
-website/local_settings.py
+website/website/local_settings.py
 certs/
 local_static/
-my.cnf
+secret/
