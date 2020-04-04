@@ -25,6 +25,7 @@ COPY files/pip-requires.txt /tmp/pip-requires.txt
 COPY files/etc/nginx/conf.d/nginx.conf /etc/nginx/conf.d/nginx.conf
 COPY files/etc/supervisor/conf.d/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY files/usr/local/bin/gunicorn-start.sh /usr/local/bin/gunicorn-start.sh
+COPY files/etc/gunicorn.conf /etc/gunicorn.conf
 # Run any needed chowns and chmods
 RUN chown -R www-data: /opt/website/ /var/log/website
 RUN chmod +x /usr/local/bin/gunicorn-start.sh
