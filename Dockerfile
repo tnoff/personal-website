@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-VOLUME ["/secret"]
+VOLUME ["/secret", "/logs"]
 
 # Insall packages
 RUN apt-get update
