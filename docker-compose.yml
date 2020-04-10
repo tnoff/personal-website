@@ -5,4 +5,4 @@ services:
     ports:
      - "8084:8084"
     volumes:
-     - ./secret:/secret
+     - ./secret/website:/secret

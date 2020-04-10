@@ -1,7 +1,7 @@
 #!/bin/bash
 
-cp /secret/website/secret_key /opt/website/
-cp /secret/website/my.cnf /opt/website/
+cp /secret/secret_key /opt/website/
+cp /secret/my.cnf /opt/website/
 
 chown -R www-data: /opt/website/secret_key /opt/website/my.cnf
 
