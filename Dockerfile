@@ -6,6 +6,7 @@ VOLUME ["/secret", "/logs"]
 RUN apt-get update
 RUN apt-get install -y \
    libmysqlclient-dev \
+   logrotate \
    nginx \
    python3-dev \
    python3-pip \
@@ -26,6 +27,7 @@ COPY files/etc/nginx/conf.d/nginx.conf /etc/nginx/conf.d/nginx.conf
 COPY files/etc/supervisor/conf.d/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY files/usr/local/bin/gunicorn-start.sh /usr/local/bin/gunicorn-start.sh
 COPY files/etc/gunicorn.conf /etc/gunicorn.conf
+COPY files/etc/logrotate.d/nginx /etc/logrotate.d/nginx
 # Run any needed chowns and chmods
 RUN chown -R www-data: /opt/website/ /var/log/website
 RUN chmod +x /usr/local/bin/gunicorn-start.sh
