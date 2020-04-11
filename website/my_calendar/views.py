@@ -68,23 +68,23 @@ def persons(request):
     append_last = []
     for person in persons:
         if person.birthday:
-            person.delta = person.birthday - today
             person.birthday_string = person.birthday.strftime("%B %d")
+            # Fix up how birthday is presented so javascript can read it
+            person.birthday_string_javascript = person.birthday.strftime(JAVASCRIPT_DATE_FORMAT)
+            # If delta is not negative add to list, else add to append list
+            if (person.birthday - today).days < 0:
+                append_last.append(person)
+            else:
+                person_list.append(person)
+        else:
+            # Keep this last so the folks with no bdays go in the append last list
+            append_last.append(person)
         if person.phone_number:
             phone_number_string = '%s (%s) %s-%s' % (person.phone_number[:-10],
                                                      person.phone_number[-10:-7],
                                                      person.phone_number[-7:-4],
                                                      person.phone_number[-4:])
-
             person.phone_number = phone_number_string
-        # Keep this last so the folks with no bdays go in the append last list
-        if person.birthday:
-            person.birthday_string = person.birthday.strftime("%B %d")
-            # Fix up how its presented so javascript can read it
-            person.birthday = person.birthday.strftime(JAVASCRIPT_DATE_FORMAT)
-            person_list.append(person)
-        else:
-            append_last.append(person)
 
     person_list.extend(append_last)
 
