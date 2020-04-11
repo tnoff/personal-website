@@ -29,7 +29,7 @@ COPY files/usr/local/bin/gunicorn-start.sh /usr/local/bin/gunicorn-start.sh
 COPY files/etc/gunicorn.conf /etc/gunicorn.conf
 COPY files/etc/logrotate.d/nginx /etc/logrotate.d/nginx
 # Run any needed chowns and chmods
-RUN chown -R www-data: /opt/website/ /var/log/website
+RUN chown -R www-data: /opt/website/
 RUN chmod +x /usr/local/bin/gunicorn-start.sh
 # Install packages
 RUN /usr/bin/pip3 install -r /tmp/pip-requires.txt
