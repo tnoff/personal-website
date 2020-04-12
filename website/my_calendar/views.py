@@ -119,9 +119,41 @@ def task_show(request, task_id):
     now = date.today()
     task = Task.objects.get(id=task_id)
     task.time_delta = task.due_date - now
+    if task.time_delta.days < -1:
+        task.time_delta = f'{task.time_delta.days} days ago'
+    elif task.time_delta.days == -1:
+        task.time_delta = '1 day ago'
+    elif task.time_delta.days == 0:
+        task.time_delta = 'today'
+    elif task.time_delta.days == 1:
+        task.time_delta = 'tomorrow'
+    else:
+        task.time_delta = f'in {task.time_delta.days} days'
     task.due_date = task.due_date.strftime("%B %d")
 
     day_of_week = DAYS_OF_WEEK[task.day_of_week][1]
+
+    # Show 1st, 2nd, 3rd, or Nth week offset
+    if task.week_offset == 1:
+        # If month offset is 0, this is every week
+        if task.month_offset == 0:
+            task.week_offset = ''
+        else:
+            task.week_offset = 'on the 1st'
+    elif task.week_offset == 2:
+        task.week_offset = 'on the 2nd'
+    elif task.week_offset == 3:
+        task.week_offset = 'one the 3rd'
+    else:
+        task.week_offset = f'one the {task.week_offset}th' 
+
+    # Show month, or multiple months
+    if task.month_offset == 0:
+        task.month_offset = ''
+    elif task.month_offset == 1:
+        task.month_offset = 'month,'
+    else:
+        task.month_offset = f'{task.month_offset} months,'
 
     view_data = {
         'task' : task,
