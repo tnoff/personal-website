@@ -64,8 +64,9 @@ def persons(request):
     _update_past_birthdays(today=today)
     persons = Person.objects.order_by('birthday')
 
-    person_list = []
-    append_last = []
+    birthday_persons = []
+    past_birthdays = []
+    no_birthdays = []
     for person in persons:
         if person.birthday:
             person.birthday_string = person.birthday.strftime("%B %d")
@@ -73,12 +74,12 @@ def persons(request):
             person.birthday_string_javascript = person.birthday.strftime(JAVASCRIPT_DATE_FORMAT)
             # If delta is not negative add to list, else add to append list
             if (person.birthday - today).days < 0:
-                append_last.append(person)
+                past_birthdays.append(person)
             else:
-                person_list.append(person)
+                birthday_persons.append(person)
         else:
             # Keep this last so the folks with no bdays go in the append last list
-            append_last.append(person)
+            no_birthdays.append(person)
         if person.phone_number:
             phone_number_string = '%s (%s) %s-%s' % (person.phone_number[:-10],
                                                      person.phone_number[-10:-7],
@@ -86,7 +87,7 @@ def persons(request):
                                                      person.phone_number[-4:])
             person.phone_number = phone_number_string
 
-    person_list.extend(append_last)
+    person_list = birthday_persons + past_birthdays + no_birthdays
 
     view_data = {
         'persons' : person_list,
