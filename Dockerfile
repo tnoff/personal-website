@@ -5,6 +5,7 @@ VOLUME ["/secret", "/logs"]
 # Insall packages
 RUN apt-get update
 RUN apt-get install -y \
+   cron \
    libmysqlclient-dev \
    logrotate \
    nginx \
@@ -27,11 +28,20 @@ COPY files/etc/nginx/conf.d/nginx.conf /etc/nginx/conf.d/nginx.conf
 COPY files/etc/supervisor/conf.d/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY files/usr/local/bin/gunicorn-start.sh /usr/local/bin/gunicorn-start.sh
 COPY files/etc/gunicorn.conf /etc/gunicorn.conf
-COPY files/etc/logrotate.d/nginx /etc/logrotate.d/nginx
+COPY files/etc/logrotate.d/website /etc/logrotate.d/website
+COPY files/etc/cron.hourly/logrotate /etc/cron.hourly/logrotate
+
 # Run any needed chowns and chmods
 RUN chown -R www-data: /opt/website/
-RUN chmod +x /usr/local/bin/gunicorn-start.sh
+RUN chmod +x /usr/local/bin/gunicorn-start.sh \
+    /etc/cron.hourly/logrotate
+
+# Setup logrotate files
+RUN sed -i 's/su root syslog/su root adm/' /etc/logrotate.conf
+RUN chmod 0644 /etc/logrotate.d/website
+
 # Install packages
 RUN /usr/bin/pip3 install -r /tmp/pip-requires.txt
+
 # Start supervisord
 CMD /usr/bin/supervisord -n

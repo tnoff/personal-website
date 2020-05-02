@@ -1,0 +1,44 @@
+/logs/nginx-error.log {
+  rotate 5
+  missingok
+  daily
+  compress
+  notifempty
+  copytruncate
+}
+
+/logs/nginx-access.log {
+  rotate 5
+  missingok
+  daily
+  compress
+  notifempty
+  copytruncate
+}
+
+/logs/gunicorn-error.log {
+  rotate 5
+  missingok
+  daily
+  compress
+  notifempty
+  copytruncate
+}
+
+/logs/gunicorn-access.log {
+  rotate 5
+  missingok
+  daily
+  compress
+  notifempty
+  copytruncate
+}
+
+/logs/website/website.log {
+  rotate 5
+  missingok
+  daily
+  compress
+  notifempty
+  copytruncate
+}
