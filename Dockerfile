@@ -1,6 +1,8 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 VOLUME ["/secret", "/logs"]
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Insall packages
 RUN apt-get update
