@@ -2,7 +2,10 @@
 *.pyc
 *.swp
 website/website/local_settings.py
+website/my.cnf
+website/secret_key
 certs/
 local_static/
 secret/
 logs/
+website.log*

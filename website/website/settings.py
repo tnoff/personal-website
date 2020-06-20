@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     # Custom apps
     'homepage',
     'my_calendar',
+    'basketball',
 ]
 
 MIDDLEWARE = [

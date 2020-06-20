@@ -1,5 +1,39 @@
 DEBUG = True
 
 STATICFILES_DIRS = [
-    '/home/tnorth/website/static',
+    '/home/tnorth/code/website/website/static',
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt': "%Y-%m-%d %H:%M:%S"
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'default'
+        },
+        'rotated_logs': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/home/tnorth/code/website/website.log',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'default',
+            'level': 'DEBUG',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'rotated_logs'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+    }
+}
+
