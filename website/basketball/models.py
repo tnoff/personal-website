@@ -23,3 +23,21 @@ class Game(models.Model):
 
     def __str__(self):
         return f'{self.date} - {self.away_team} vs {self.home_team}'
+
+class Player(models.Model):
+    tag = models.CharField(max_length=16, primary_key=True)
+    name = models.CharField(max_length=255)
+
+class GameRoster(models.Model):
+    class Meta:
+        unique_together = ('team', 'game')
+
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+
+class GameRosterMemebership(models.Model):
+    class Meta:
+        unique_together = ('roster', 'player')
+    roster = models.ForeignKey(GameRoster, on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    starter = models.BooleanField(default=False)

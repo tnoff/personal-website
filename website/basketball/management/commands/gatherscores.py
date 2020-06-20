@@ -9,7 +9,7 @@ import requests
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
 
-from basketball.models import Game, Team
+from basketball.models import Game, GameRoster, GameRosterMemebership, Team, Player
 
 
 logger = logging.getLogger(__name__)
@@ -77,19 +77,17 @@ def _get_team_metadata(soup):
         else:
             home_team = deepcopy(team_data)
 
-        team_id = None
         try:
-            new_team = Team(**team_data)
-            new_team.save()
-            logger.info(f'Adding new team {team_data}, id {new_team.id}')
+            team = Team(**team_data)
+            team.save()
+            logger.info(f'Adding new team {team_data}, id {team.id}')
         except IntegrityError:
-            logger.debug(f'Unable to add new team {team_data}, team likely already exists')
-            new_team = [i for i in Team.objects.filter(year=team_data['year'], short_name=team_data['short_name'])][0]
+            team = [i for i in Team.objects.filter(year=team_data['year'], short_name=team_data['short_name'])][0]
 
         if count == 0:
-            away_team = new_team
+            away_team = team
         else:
-            home_team = new_team
+            home_team = team
 
     scores = soup.find_all('div', {'class': 'score'})
     for (count, score) in enumerate(scores):
@@ -98,6 +96,28 @@ def _get_team_metadata(soup):
         else:
             home_team.score  = int(score.text)
     return away_team, home_team
+
+def _add_game_roster(team, game):
+    try:
+        team_roster = GameRoster(team=team, game=game)
+        team_roster.save()
+        logger.info(f'Adding game roster {team_roster.id}')
+    except IntegrityError:
+        team_roster = [i for i in GameRoster.objects.filter(team=team, game=game)][0]
+    return team_roster
+
+def _add_player(player_th):
+    player_tag = player_th.get('data-append-csv')
+    if not player_tag:
+        return None
+    player_name = player_th.find('a').text
+    try:
+        player = Player(tag=player_tag, name=player_name)
+        player.save()
+        logger.info(f'Adding a new player {player.tag}')
+    except IntegrityError:
+        player = Player.objects.get(key=player_tag)
+    return player
 
 def process_box_score(box_score_url):
     '''
@@ -124,12 +144,49 @@ def process_box_score(box_score_url):
             'home_team': home_team,
             'home_score': home_team.score,
         }
-        new_game = Game(**game_data)
-        new_game.save()
-        logger.info(f'Adding new game {game_data}, id {new_game.id}')
+        game = Game(**game_data)
+        game.save()
+        logger.info(f'Adding new game {game_data}, id {game.id}')
     except IntegrityError:
-        logger.debug(f'Unable to add new game {game_data}, assuming it already exists')
-        pass 
+        game = [i for i in Game.objects.filter(date=game_date, away_team=away_team, home_team=home_team)][0]
+
+    away_team_roster = _add_game_roster(away_team, game)
+    home_team_roster = _add_game_roster(home_team, game)
+
+    # How the tables get formatted here are a little weird
+    # Basically the last first half of the tables are team one
+    # Then the second half are team two
+    stats_tables = soup.find_all('table', {'class': 'stats_table'})
+    away_team_table = stats_tables[0]
+    home_team_table = stats_tables[int(len(stats_tables)/2)]
+
+    for (count, player_th) in enumerate(away_team_table.find_all('th', {'data-stat': 'player'})):
+        player = _add_player(player_th)
+        if not player:
+            continue
+
+        starter = False
+        if count < 5:
+            starter = True
+        try:
+            roster_membership = GameRosterMemebership(roster=away_team_roster, player=player, starter=starter)
+            roster_membership.save()
+        except IntegrityError:
+            pass
+
+    for (count, player_th) in enumerate(home_team_table.find_all('th', {'data-stat': 'player'})):
+        player = _add_player(player_th)
+        if not player:
+            continue
+
+        starter = False
+        if count < 5:
+            starter = True
+        try:
+            roster_membership = GameRosterMemebership(roster=home_team_roster, player=player, starter=starter)
+            roster_membership.save()
+        except IntegrityError:
+            pass
 
 class Command(BaseCommand):
     help = 'Gather box scores for year'
