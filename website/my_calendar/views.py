@@ -60,14 +60,30 @@ def persons(request):
     '''
     Show all persons with phone numbers and birthdays
     '''
+    # Only show given groups
+    groups = request.GET.get('groups', '')
+    if groups:
+        groups = groups.split(',')
+
     today = date.today()
     _update_past_birthdays(today=today)
-    persons = Person.objects.order_by('birthday')
+
+    # If no groups, get all people
+    if not groups:
+        persons = Person.objects.all()
+    # Else iterate through all groups
+    else:
+        # Use first group to create first queryset
+        persons = Person.objects.filter(groups__name=groups[0])
+        for group in groups[1:]:
+            persons = persons | Person.objects.filter(groups__name=group)
+
 
     birthday_persons = []
     past_birthdays = []
     no_birthdays = []
-    for person in persons:
+    for person in persons.order_by('birthday'):
+        person.group_names = [group.name for group in person.groups.all()]
         if person.birthday:
             person.birthday_string = person.birthday.strftime("%B %d")
             # Fix up how birthday is presented so javascript can read it
