@@ -3,3 +3,4 @@ website.log*
 website/my.cnf
 website/secret_key
 website/website.log*
+website/*.sqlite3

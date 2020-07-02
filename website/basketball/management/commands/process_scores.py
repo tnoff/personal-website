@@ -14,52 +14,16 @@ from basketball.models import Game, GameRoster, GameRosterMemebership, Team, Pla
 
 logger = logging.getLogger(__name__)
 
-BASE_URL = 'https://www.basketball-reference.com'
-GAME_MONTHS = [
-    'october',
-    'november',
-    'december',
-    'january',
-    'february',
-    'march',
-    'april',
-    'may',
-    'june',
-]
-
 TEAMS_HREF_REGEX = r'^/teams/(?P<short_name>[A-Z0-9]+)/(?P<year>[0-9]+).html'
 BOX_SCORE_DATE_REGEX = r'^(?P<year>[0-9]{4})(?P<month>[0-9]{2})(?P<day>[0-9]{2}).*'
 
-
-def box_scores(year, month):
-    '''
-    Get url for boxscores from month
-    '''
-    return f'{BASE_URL}/leagues/NBA_{year}_games-{month}.html'
-
-def gather_box_scores(year):
-    all_box_scores = []
-    for month in GAME_MONTHS:
-        logger.debug(f'Generating box scores for month {month}')
-        url = box_scores(year, month)
-        req = requests.get(url)
-        if req.status_code != 200:
-            logger.warning(f'Unable to generate information from url {url}')
-            continue
-        logger.info(f'Generating box scores from {url}')
-        soup = BeautifulSoup(req.text, 'html.parser')
-        schedule_table = soup.find('table', id='schedule')
-        for box_score in schedule_table.find_all('td', {'data-stat': 'box_score_text'}):
-            try:
-                all_box_scores.append(f'{BASE_URL}{box_score.find("a").get("href")}')
-            except AttributeError:
-                pass
-    return all_box_scores
-
 def _get_team_metadata(soup):
+    '''
+    Grab team info from top of page
+    '''
     teams = soup.find_all('div', {'itemtype': 'https://schema.org/Organization'})
     if len(teams) != 2:
-        raise StatProcessorException(f'Invalid number of teams {len(teams)}')
+        raise Exception(f'Invalid number of teams {len(teams)}')
     away_team = None
     home_team = None
 
@@ -98,6 +62,9 @@ def _get_team_metadata(soup):
     return away_team, home_team
 
 def _add_game_roster(team, game):
+    '''
+    Either add new roster or get existing one
+    '''
     try:
         team_roster = GameRoster(team=team, game=game)
         team_roster.save()
@@ -107,6 +74,9 @@ def _add_game_roster(team, game):
     return team_roster
 
 def _add_player(player_th):
+    '''
+    Either add new player or get existing one
+    '''
     player_tag = player_th.get('data-append-csv')
     if not player_tag:
         return None
@@ -124,18 +94,24 @@ def process_box_score(box_score_url):
     Process data from box scores
     box_score_url   :   Box Score URL
     '''
+
+    # First grab date info
     date_info = re.match(BOX_SCORE_DATE_REGEX, box_score_url.split('/')[-1])
     game_date = date(year=int(date_info.group('year')),
                      month=int(date_info.group('month')),
                      day=int(date_info.group('day')))
+
+    # Then get html result
     req = requests.get(box_score_url)
     if req.status_code != 200:
         logger.warning(f'Unable to process box score url {box_score_url}')
         return
     soup = BeautifulSoup(req.text, 'html.parser')
 
+    # Get the team data first from the top
     away_team, home_team = _get_team_metadata(soup)
 
+    # Add game data here first
     try:
         game_data = {
             'date': game_date,
@@ -150,6 +126,7 @@ def process_box_score(box_score_url):
     except IntegrityError:
         game = [i for i in Game.objects.filter(date=game_date, away_team=away_team, home_team=home_team)][0]
 
+    # Get game rosters
     away_team_roster = _add_game_roster(away_team, game)
     home_team_roster = _add_game_roster(home_team, game)
 
@@ -159,7 +136,8 @@ def process_box_score(box_score_url):
     stats_tables = soup.find_all('table', {'class': 'stats_table'})
     away_team_table = stats_tables[0]
     home_team_table = stats_tables[int(len(stats_tables)/2)]
-
+    # For home and away team, get rosters
+    # Assume here that the first 5 players are starters
     for (count, player_th) in enumerate(away_team_table.find_all('th', {'data-stat': 'player'})):
         player = _add_player(player_th)
         if not player:
@@ -189,15 +167,12 @@ def process_box_score(box_score_url):
             pass
 
 class Command(BaseCommand):
-    help = 'Gather box scores for year'
+    help = 'Process given box scores'
 
     def add_arguments(self, parser):
-        parser.add_argument('year', type=int)
+        parser.add_argument('box_scores', nargs='+')
 
     def handle(self, *args, **options):
-        logger.info(f'Scrapping data for basketball from year {options["year"]}')
-
-        box_scores = gather_box_scores(options['year'])
-        for box_score in box_scores:
+        for box_score in options['box_scores']:
             logger.debug(f'Processing new box score {box_score}')
             process_box_score(box_score)
