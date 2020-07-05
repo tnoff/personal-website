@@ -154,6 +154,8 @@ def team_show(request, year, short_name):
                 game.result = "Win"
             game.diff = game.home_score - game.away_score
         team_game_list.append(game)
+        # Make sure game diff is absolute value
+        game.diff = abs(game.diff)
 
     view_data = {
         'all_team_data': team_data,
