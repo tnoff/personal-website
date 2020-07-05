@@ -19,14 +19,14 @@
         </tr>
     </thead>
     <tbody>
-    {% for team in team_data %}
+    {% for team_season in team_data %}
         <tr>
-            <td>{{team.standing}}</td>
-            <td><a href="/294be434-0c6c-4118-a286-d4a3dfd3032e/{{team.year}}/{{team.short_name}}">{{team.name}}</td>
-            <td>{{team.point_differential_per_game}}</td>
-            <td>{{team.wins}}-{{team.losses}}</td>
-            <td>{{team.point_differential_last_eight}}</td>
-            <td>{{team.wins_last_eight}}-{{team.losses_last_eight}}</td>
+            <td>{{team_season.standing}}</td>
+            <td><a href="/294be434-0c6c-4118-a286-d4a3dfd3032e/{{team_season.team.year}}/{{team_season.team.short_name}}">{{team_season.team.name}}</td>
+            <td>{{team_season.point_differential_per_game}}</td>
+            <td>{{team_season.wins}}-{{team_season.losses}}</td>
+            <td>{{team_season.point_differential_last_eight}}</td>
+            <td>{{team_season.wins_last_eight}}-{{team_season.losses_last_eight}}</td>
         </tr>
     {% endfor %}
     </tbody>

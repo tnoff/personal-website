@@ -24,6 +24,18 @@ class Game(models.Model):
     def __str__(self):
         return f'{self.date} - {self.away_team} vs {self.home_team}'
 
+class TeamSeason(models.Model):
+    team = models.OneToOneField(Team, on_delete=models.CASCADE, related_name='team_season')
+    wins = models.IntegerField(blank=False, null=False)
+    losses = models.IntegerField(blank=False, null=False)
+    point_differential = models.FloatField(blank=False, null=False)
+    wins_last_eight = models.IntegerField(blank=False, null=False)
+    losses_last_eight = models.IntegerField(blank=False, null=False)
+    point_differential_last_eight = models.FloatField(blank=False, null=False)
+
+    def __str__(self):
+        return f'{self.team} - {self.wins}-{self.losses}'
+
 class Player(models.Model):
     tag = models.CharField(max_length=16, primary_key=True)
     name = models.CharField(max_length=255)
