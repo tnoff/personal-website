@@ -5,7 +5,8 @@ from django.http import Http404
 from django.shortcuts import render
 from django_otp.decorators import otp_required
 
-from basketball.models import Game, Team, TeamSeason
+from basketball.models import Game, GameRoster, GameRosterMembership
+from basketball.models import Team, TeamSeason
 
 logger = logging.getLogger(__name__)
 
@@ -68,3 +69,27 @@ def team_show(request, year, short_name):
     }
 
     return render(request, 'basketball/team.html', view_data)
+
+@otp_required
+def game_show(request, game):
+    '''
+    Get game information
+    '''
+    game = Game.objects.get(id=game)
+    if not game:
+        raise Http404(f'Unable to locate game')
+
+    away_roster = GameRoster.objects.filter(team=game.away_team, game=game).first()
+    home_roster = GameRoster.objects.filter(team=game.home_team, game=game).first()
+
+    away_roster_members = GameRosterMembership.objects.filter(roster=away_roster)
+    home_roster_members = GameRosterMembership.objects.filter(roster=home_roster)
+
+
+    view_data = {
+        'game': game,
+        'away_roster': away_roster_members,
+        'home_roster': home_roster_members,
+    }
+
+    return render(request, 'basketball/game.html', view_data)

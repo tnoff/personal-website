@@ -24,10 +24,10 @@
     <tbody>
     {% for game in games %}
         <tr>
-            <td>{{game.date}}</td>
+            <td><a href="/294be434-0c6c-4118-a286-d4a3dfd3032e/game/{{game.id}}">{{game.date}}</a></td>
             <td>{{game.away_team.short_name}}-{{game.away_score}} vs {{game.home_team.short_name}}-{{game.home_score}}</td>
             <td>{{game.result}} - {{game.diff}}</td>
         </tr>
     {% endfor %}
-
+</table>
 {% endblock %}

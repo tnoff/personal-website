@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Custom CSS Styles -->
+<style type="text/css">
+</style>
+
+<!-- Main page -->
+<h1>{{game.away_team.name}} vs {{game.home_team.name}}</h1>
+<h2>{{game.away_score }} - {{game.home_score}}</h2>
+<h2>{{game.date}}</h2>
+
+<div class="row">
+    <div class="col">
+        <h2>Away Team Roster</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Player</th>
+                    <th scope="col">Starter</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for member in away_roster %}
+                <tr>
+                    <td>{{member.player.name}}</td>
+                    {% if member.starter %}
+                    <td>Yes</td>
+                    {% else %}
+                    <td>No</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col">
+        <h2>Home Team Roster</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Player</th>
+                    <th scope="col">Starter</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for member in home_roster %}
+                <tr>
+                    <td>{{member.player.name}}</td>
+                    {% if member.starter %}
+                    <td>Yes</td>
+                    {% else %}
+                    <td>No</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

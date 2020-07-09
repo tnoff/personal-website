@@ -127,7 +127,7 @@ class Command(BaseCommand):
                     existing_season.wins = team_data['wins']
                     existing_season.losses = team_data['losses']
                     existing_season.point_differential = team_data['point_differential']
-                    existing_season.wins_last_eight = team['wins_last_eight']
-                    existing_season.losses_last_eight =  team['losses_last_eight']
-                    existing_season.point_differential_last_eight = team['point_differential_last_eight']
+                    existing_season.wins_last_eight = team_data['wins_last_eight']
+                    existing_season.losses_last_eight =  team_data['losses_last_eight']
+                    existing_season.point_differential_last_eight = team_data['point_differential_last_eight']
                     existing_season.save()

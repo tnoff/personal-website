@@ -47,7 +47,7 @@ class GameRoster(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
-class GameRosterMemebership(models.Model):
+class GameRosterMembership(models.Model):
     class Meta:
         unique_together = ('roster', 'player')
     roster = models.ForeignKey(GameRoster, on_delete=models.CASCADE)

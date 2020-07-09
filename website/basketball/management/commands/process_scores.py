@@ -9,7 +9,7 @@ import requests
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
 
-from basketball.models import Game, GameRoster, GameRosterMemebership, Team, Player
+from basketball.models import Game, GameRoster, GameRosterMembership, Team, Player
 
 
 logger = logging.getLogger(__name__)
@@ -144,10 +144,10 @@ def process_box_score(box_score_url):
             continue
 
         starter = False
-        if count < 5:
+        if count < 6:
             starter = True
         try:
-            roster_membership = GameRosterMemebership(roster=away_team_roster, player=player, starter=starter)
+            roster_membership = GameRosterMembership(roster=away_team_roster, player=player, starter=starter)
             roster_membership.save()
         except IntegrityError:
             pass
@@ -158,10 +158,10 @@ def process_box_score(box_score_url):
             continue
 
         starter = False
-        if count < 5:
+        if count < 6:
             starter = True
         try:
-            roster_membership = GameRosterMemebership(roster=home_team_roster, player=player, starter=starter)
+            roster_membership = GameRosterMembership(roster=home_team_roster, player=player, starter=starter)
             roster_membership.save()
         except IntegrityError:
             pass
