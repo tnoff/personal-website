@@ -10,3 +10,4 @@ secret/
 logs/
 website.log*
 website/*.sqlite3
+website/geckodriver.log

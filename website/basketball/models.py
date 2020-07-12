@@ -53,3 +53,13 @@ class GameRosterMembership(models.Model):
     roster = models.ForeignKey(GameRoster, on_delete=models.CASCADE)
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     starter = models.BooleanField(default=False)
+
+class Lineup(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    players = models.ManyToManyField(Player)
+
+class GameLineupStats(models.Model):
+    lineup = models.ForeignKey(Lineup, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    seconds_played = models.IntegerField(blank=False, null=False)
+    point_differential = models.IntegerField(blank=False, null=False) 

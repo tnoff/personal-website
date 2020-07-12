@@ -8,6 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 RUN apt-get install -y \
    cron \
+   firefox \
    libmysqlclient-dev \
    logrotate \
    nginx \
@@ -18,8 +19,13 @@ RUN apt-get install -y \
    curl \
    vim \
    less \
+   wget \
    # Cleanup
    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Setup gecko driver
+RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz -o /usr/local/lib/geckodriver
+RUN chmod +x /usr/local/lib/geckodriver
 
 # Make directories
 RUN mkdir -p /opt/website/ /var/log/website/

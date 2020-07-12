@@ -8,54 +8,101 @@
     <h2>{{game.date}}</h2>
 </div>
 
-<hr>
-
 <div class="row">
     <div class="col">
-        <h2>Away Team Roster</h2>
         <table class="table">
             <thead>
                 <tr>
                     <th scope="col">Player</th>
-                    <th scope="col">Starter</th>
+                    <th scope="col">Time Played</th>
+                    <th scope="col">Point Differential</th>
                 </tr>
             </thead>
             <tbody>
-            {% for member in away_roster %}
+            {% for player in away_player_stats %}
                 <tr>
-                    <td>{{member.player.name}}</td>
-                    {% if member.starter %}
-                    <td>Yes</td>
-                    {% else %}
-                    <td>No</td>
-                    {% endif %}
+                    <td>{{player.player.name}}</td>
+                    <td>{{player.time_played}}</td>
+                    <td>{{player.point_diff}}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
     <div class="col">
-        <h2>Home Team Roster</h2>
         <table class="table">
             <thead>
                 <tr>
                     <th scope="col">Player</th>
-                    <th scope="col">Starter</th>
+                    <th scope="col">Time Played</th>
+                    <th scope="col">Point Differential</th>
                 </tr>
             </thead>
             <tbody>
-            {% for member in home_roster %}
+            {% for player in home_player_stats %}
                 <tr>
-                    <td>{{member.player.name}}</td>
-                    {% if member.starter %}
-                    <td>Yes</td>
-                    {% else %}
-                    <td>No</td>
-                    {% endif %}
+                    <td>{{player.player.name}}</td>
+                    <td>{{player.time_played}}</td>
+                    <td>{{player.point_diff}}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<h3>Away Team</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Player 1</th>
+            <th scope="col">Player 2</th>
+            <th scope="col">Player 3</th>
+            <th scope="col">Player 4</th>
+            <th scope="col">Player 5</th>
+            <th scope="col">Time Played</th>
+            <th scope="col">Point Differential</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lineup_stats in away_lineup_stats %}
+            <tr>
+                {% for player in lineup_stats.players %}
+                <td>{{player.name}}</td>
+                {% endfor %}
+                <td>{{lineup_stats.time_played}}</td>
+                <td>{{lineup_stats.point_differential}}</td> 
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Home Team</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Player 1</th>
+            <th scope="col">Player 2</th>
+            <th scope="col">Player 3</th>
+            <th scope="col">Player 4</th>
+            <th scope="col">Player 5</th>
+            <th scope="col">Time Played</th>
+            <th scope="col">Point Differential</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lineup_stats in home_lineup_stats %}
+            <tr>
+                {% for player in lineup_stats.players %}
+                <td>{{player.name}}</td>
+                {% endfor %}
+                <td>{{lineup_stats.time_played}}</td>
+                <td>{{lineup_stats.point_differential}}</td> 
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock %}
