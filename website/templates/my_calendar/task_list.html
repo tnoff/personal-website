@@ -21,7 +21,7 @@
         <tr>
             <td>{{task.message}}</td>
             <td>{{task.due_date_no_year}}</td>
-            <td class="timeDelta" due-date="{{task.due_date}}"></td>
+            <td>{{task.time_delta.days}}</td>
             <td>
                 <form action="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/{{task.id}}/done" method="post">
                     {% csrf_token %}
@@ -32,17 +32,4 @@
         {% endfor %}
     </tbody>
 </table>
-
-<!-- Get date delta for days left !-->
-<script>
-var one_day=1000*60*60*24;
-var today = new Date().getTime();
-var all_task_deltas = document.getElementsByClassName("timeDelta");
-for (var i = 0; i < all_task_deltas.length; i++) {
-    var due_date = new Date(all_task_deltas[i].getAttribute("due-date")).getTime();
-    var difference_ms = due_date - today;
-    var diff_days = Math.round(difference_ms/one_day) + 1;
-    all_task_deltas[i].textContent = diff_days;
-}
-</script>
 {% endblock %}

@@ -1,13 +1,21 @@
 from datetime import date, datetime, timedelta
 
+import pytz
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django_otp.decorators import otp_required
+from django.utils import timezone
 
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
-from my_calendar.models import Person, Task
+from my_calendar.models import Person, Task, WebsiteUserSettings
 
-JAVASCRIPT_DATE_FORMAT = "%B %d, %Y"
+def _get_today_with_timezone(request):
+    try:
+        tz = pytz.timezone(request.user.websiteusersettings.timezone.zone)
+        return datetime.now(tz).date()
+    except AttributeError:
+        return datetime.now().date()
 
 def _update_past_birthdays(today=None, delta=31):
     '''
@@ -15,7 +23,7 @@ def _update_past_birthdays(today=None, delta=31):
     Delta: Offset when to rotate birthdays
     '''
     if today is None:
-        today = date.today()
+        today = _get_today_with_timezone(request)
     past_bdays = Person.objects.filter(birthday__lt=(today - timedelta(delta)))
     for person in past_bdays:
         person.birthday = date(today.year + 1, person.birthday.month, person.birthday.day)
@@ -50,9 +58,10 @@ def _find_next_due_date(task, start):
 class Day():
     def __init__(self, datetime_date, today):
         self.datetime_date = datetime_date
-        self.datetime_string = datetime_date.strftime(JAVASCRIPT_DATE_FORMAT)
         self.birthdays = [item.name for item in Person.objects.filter(birthday=datetime_date)]
         self.tasks = [item for item in Task.objects.filter(due_date=datetime_date)]
+        print("Is today:", datetime_date == today)
+        self.is_today = datetime_date == today
 
 
 @otp_required
@@ -65,7 +74,7 @@ def persons(request):
     if groups:
         groups = groups.split(',')
 
-    today = date.today()
+    today = _get_today_with_timezone(request)
     _update_past_birthdays(today=today)
 
     # If no groups, get all people
@@ -86,10 +95,13 @@ def persons(request):
         person.group_names = [group.name for group in person.groups.all()]
         if person.birthday:
             person.birthday_string = person.birthday.strftime("%B %d")
-            # Fix up how birthday is presented so javascript can read it
-            person.birthday_string_javascript = person.birthday.strftime(JAVASCRIPT_DATE_FORMAT)
+            person.birthday_delta = (person.birthday - today).days
             # If delta is not negative add to list, else add to append list
             if (person.birthday - today).days < 0:
+                birthday_next_year = date(person.birthday.year + 1,
+                                          person.birthday.month,
+                                          person.birthday.day)
+                person.birthday_delta = (birthday_next_year - today).days
                 past_birthdays.append(person)
             else:
                 birthday_persons.append(person)
@@ -115,7 +127,7 @@ def task_list(request):
     '''
     Show tasks as a sorted list
     '''
-    now = date.today()
+    now = _get_today_with_timezone(request)
     tasks = Task.objects.all()
     for task in tasks:
         task.time_delta = task.due_date - now
@@ -132,7 +144,7 @@ def task_show(request, task_id):
     '''
     Show individual task
     '''
-    now = date.today()
+    now = _get_today_with_timezone(request)
     task = Task.objects.get(id=task_id)
     task.time_delta = task.due_date - now
     if task.time_delta.days < -1:
@@ -182,7 +194,7 @@ def task_mark_done(request, task_id):
     '''
     API call to mark task as done
     '''
-    now = date.today()
+    now = _get_today_with_timezone(request)
     task = Task.objects.get(id=task_id)
     # If past due date, use today
     if task.due_date < now:
@@ -199,7 +211,7 @@ def calendar(request, year=None, month=None):
     Calednar view with birthdays and tasks
     '''
     # Get date from defaults
-    today = date.today()
+    today = _get_today_with_timezone(request)
     _update_past_birthdays(today=today)
     try:
         year = int(year)

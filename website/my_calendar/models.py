@@ -1,4 +1,13 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+from timezone_field import TimeZoneField
+
+# https://stackoverflow.com/questions/2886987/adding-custom-fields-to-users-in-django
+# https://docs.djangoproject.com/en/dev/topics/auth/customizing/#extending-django-s-default-user
+class WebsiteUserSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    timezone = TimeZoneField(default='America/Los_Angeles')
 
 class Group(models.Model):
     name = models.CharField(max_length=255)

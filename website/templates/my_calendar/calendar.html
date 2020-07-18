@@ -3,6 +3,9 @@
 {% block content %}
 <!-- Custom CSS Styles -->
 <style type="text/css">
+    #today {
+        border: 5px solid #04B486;
+    }
     .table {
         border: none;
         border-collapse: collapse;
@@ -55,13 +58,15 @@
         {# Every row matches up to a week #}
         {% for week_row in week_table_rows %}
         <tr>
-        {# Every column matches to day #}
-        {% for week_day in week_row %}
+            {# Every column matches to day #}
+            {% for week_day in week_row %}
             {# If day is none, skip with empty column#}
-            {% if not week_day %}
-            <td></td>
+            {# Set today metadata if it is today #}
+            {% if not week_day or not week_day.is_today %}
+            <td>
             {% else %}
-            <td class="day-cell" date="{{week_day.datetime_string}}">
+            <td id="today">
+            {% endif %}
                 {# Show day number #}
                 <p>{{week_day.datetime_date.day}}</p>
                 {# Iterate through birthdays #}
@@ -75,24 +80,9 @@
                     </a>
                 {% endfor %}
             </td>
-            {% endif %}
-        {% endfor %}
+            {% endfor %}
         </tr>
         {% endfor %}
     </tbody>
 </table>
-
-<!-- Identify current date and format table cell !-->
-<script>
-var today = new Date().toLocaleDateString();
-var day_cells = document.getElementsByClassName("day-cell");
-for (var i = 0; i < day_cells.length; i++) {
-    var p_tag = day_cells[i].getElementsByTagName('p')[0];
-    var day_date = new Date(day_cells[i].getAttribute("date")).toLocaleDateString();
-    if ( day_date == today ) {
-        p_tag.style.color = "#04B486";
-        day_cells[i].style.border = "5px solid #04B486";
-    }
-}
-</script>
 {% endblock %}

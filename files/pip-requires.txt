@@ -9,3 +9,4 @@ phonenumbers>=8.11.4
 Pillow>=7.0.0
 beautifulsoup4>=4.9.1
 requests>=2.24.0
+django-timezone-field>=4.0
