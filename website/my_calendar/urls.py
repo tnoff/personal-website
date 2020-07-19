@@ -10,4 +10,5 @@ my_calendar_urls = [
     re_path(r'5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/?$', views.calendar),
     re_path(r'5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/(?P<year>\d+)/?$', views.calendar),
     re_path(r'5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/(?P<year>\d+)/(?P<month>\d+)/$', views.calendar),
+    re_path(r'6a8a3ce2-a91f-4605-8010-145c113d467f/(?P<event_id>\d+)/?$', views.event_show),
 ]

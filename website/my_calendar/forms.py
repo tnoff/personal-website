@@ -4,7 +4,7 @@ import string
 from django import forms
 
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
-from my_calendar.models import Person, Task
+from my_calendar.models import Event, Person, Task
 
 # https://stackoverflow.com/questions/16699007/regular-expression-to-match-standard-10-digit-phone-number
 PHONE_NUMBER_REGEX = '^(\+?\d{1,2})?(\s)?\(?\d{3}\)?([\s.-])?\d{3}([\s.-])?\d{4}'
@@ -25,6 +25,17 @@ class PersonForm(forms.ModelForm):
             return f'+1{just_digits}'
         return f'+{just_digits}'
 
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = '__all__'
+
+    def clean_end(self):
+        if self.cleaned_data['start'] > self.cleaned_data['end']:
+            raise forms.ValidationError('Start of event must come before end')
+        if self.cleaned_data['end'].day != self.cleaned_data['start'].day:
+            raise forms.ValidationError('Events cannot span multiple days')
+        return self.cleaned_data['end']
 
 class TaskForm(forms.ModelForm):
     day_of_week = forms.ChoiceField(choices = DAYS_OF_WEEK)

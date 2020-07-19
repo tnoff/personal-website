@@ -9,6 +9,9 @@ class WebsiteUserSettings(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     timezone = TimeZoneField(default='America/Los_Angeles')
 
+    def __str__(self):
+        return self.user.username
+
 class Group(models.Model):
     name = models.CharField(max_length=255)
 
@@ -34,3 +37,12 @@ class Task(models.Model):
 
     def __str__(self):
         return self.message
+
+class Event(models.Model):
+    title = models.CharField(max_length=64, null=False, blank=False)
+    description = models.TextField(blank=False, null=False)
+    start = models.DateTimeField(blank=False, null=False)
+    end = models.DateTimeField(blank=False, null=False)
+
+    def __str__(self):
+        return self.title

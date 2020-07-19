@@ -3,12 +3,13 @@ from datetime import date, datetime, timedelta
 import pytz
 
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from django.shortcuts import redirect, render
 from django_otp.decorators import otp_required
 from django.utils import timezone
 
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
-from my_calendar.models import Person, Task, WebsiteUserSettings
+from my_calendar.models import Event, Person, Task, WebsiteUserSettings
 
 def _get_today_with_timezone(request):
     try:
@@ -28,6 +29,23 @@ def _update_past_birthdays(today=None, delta=31):
     for person in past_bdays:
         person.birthday = date(today.year + 1, person.birthday.month, person.birthday.day)
         person.save()
+
+def get_time_view(item):
+    item.time_string = ''
+    if item.start.hour < 10:
+        item.time_string = f'{item.time_string}0'
+    item.time_string = f'{item.time_string}{item.start.hour}:'
+    if item.start.minute < 10:
+        item.time_string = f'{item.time_string}0'
+    item.time_string = f'{item.time_string}{item.start.minute}-'
+    if item.end.hour < 10:
+        item.time_string = f'{item.time_string}0'
+    item.time_string = f'{item.time_string}{item.end.hour}:'
+    if item.end.minute < 10:
+        item.time_string = f'{item.time_string}0'
+    item.time_string = f'{item.time_string}{item.end.minute}'
+    return item
+
 
 def _find_next_due_date(task, start):
     task.time_delta = task.due_date - start
@@ -56,13 +74,18 @@ def _find_next_due_date(task, start):
 
 
 class Day():
-    def __init__(self, datetime_date, today):
+    def __init__(self, datetime_date, today, timezone=None):
         self.datetime_date = datetime_date
+        self.is_today = datetime_date == today
         self.birthdays = [item.name for item in Person.objects.filter(birthday=datetime_date)]
         self.tasks = [item for item in Task.objects.filter(due_date=datetime_date)]
-        print("Is today:", datetime_date == today)
-        self.is_today = datetime_date == today
-
+        self.events = []
+        for item in Event.objects.filter(start__range=[datetime_date, datetime_date + timedelta(days=1)]):
+            if timezone:
+                item.start = item.start.astimezone(timezone)
+                item.end = item.end.astimezone(timezone)
+            item = get_time_view(item)
+            self.events.append(item)
 
 @otp_required
 def persons(request):
@@ -146,6 +169,8 @@ def task_show(request, task_id):
     '''
     now = _get_today_with_timezone(request)
     task = Task.objects.get(id=task_id)
+    if not task:
+        raise Http404(f'Unable to locate task')
     task.time_delta = task.due_date - now
     if task.time_delta.days < -1:
         task.time_delta = f'{task.time_delta.days} days ago'
@@ -196,6 +221,8 @@ def task_mark_done(request, task_id):
     '''
     now = _get_today_with_timezone(request)
     task = Task.objects.get(id=task_id)
+    if not task:
+        raise Http404(f'Unable to locate task')
     # If past due date, use today
     if task.due_date < now:
          _find_next_due_date(task, now)
@@ -213,6 +240,11 @@ def calendar(request, year=None, month=None):
     # Get date from defaults
     today = _get_today_with_timezone(request)
     _update_past_birthdays(today=today)
+    try:
+        tz = pytz.timezone(request.user.websiteusersettings.timezone.zone)
+    except AttributeError:
+        tz = None
+
     try:
         year = int(year)
     except TypeError:
@@ -247,7 +279,7 @@ def calendar(request, year=None, month=None):
         week_row.append(None)
     # Iterate through all month days
     while datetime_day.month == month:
-        day_object = Day(datetime_day, today)
+        day_object = Day(datetime_day, today, timezone=tz)
         week_row.append(day_object)
         if datetime_day.weekday() == 6:
             week_table_rows.append(week_row)
@@ -259,8 +291,6 @@ def calendar(request, year=None, month=None):
             week_row.append(None)
         week_table_rows.append(week_row)
 
-
-
     # Construct all variables
     view_data = {
         'calendar_name' : '%s %s' % (MONTHS[month - 1][1], year),
@@ -270,3 +300,25 @@ def calendar(request, year=None, month=None):
         'week_table_rows' : week_table_rows,
     }
     return render(request, 'my_calendar/calendar.html', view_data)
+
+@otp_required
+def event_show(request, event_id):
+    '''
+    Show full info for given event
+    '''
+    event = Event.objects.get(pk=event_id)
+    if not event:
+        raise Http404(f'Unable to locate event')
+    try:
+        tz = pytz.timezone(request.user.websiteusersettings.timezone.zone)
+        event.start = event.start.astimezone(tz)
+        event.end = event.end.astimezone(tz)
+    except AttributeError:
+        pass
+
+    event = get_time_view(event)
+    view_data = {
+        'event': event,
+    }
+
+    return render(request, 'my_calendar/event_show.html', view_data)
