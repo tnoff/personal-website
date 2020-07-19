@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Custom CSS Styles -->
-<style type="text/css">
-</style>
 
-<!-- Main page -->
-<h1>{{game.away_team.name}} vs {{game.home_team.name}}</h1>
-<h2>{{game.away_score }} - {{game.home_score}}</h2>
-<h2>{{game.date}}</h2>
+<div align="center">
+    <h1>{{game.away_team.name}} vs {{game.home_team.name}}</h1>
+    <h2>{{game.away_score }} - {{game.home_score}}</h2>
+    <h2>{{game.date}}</h2>
+</div>
+
+<hr>
 
 <div class="row">
     <div class="col">

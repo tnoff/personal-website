@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Custom CSS Styles -->
 <style type="text/css">
     #today {
         border: 5px solid #04B486;
@@ -23,10 +22,12 @@
     .wide {
         width: 100%;
     }
+    .header {
+        padding-top: 5px;
+    }
 </style>
 
-<!-- Top month selector -->
-<div class="row">
+<div align="center"class="row header">
     <div class="col">
         <a href="/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/{{prev_month}}">
             <button class="btn btn-secondary">Previous Month</button>
