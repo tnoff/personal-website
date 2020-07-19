@@ -1,22 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Custom CSS Styles -->
 <style type="text/css">
-    #headshot {
-        width: 50%;
-        height: auto;
-        padding-bottom: 15px;
-    }
-
-    #top-banner {
+    #header{
         padding-bottom: 15px;
     }
 </style>
 
-<!-- Main page -->
-<h2 id="top-banner">Webpage of Tyler North</h2>
+<div id="header" align="center">
+    <h1>Webpage of Tyler North</h2>
+    <p>Software Engineer in the San Francisco Bay Area, currently working at Oracle.</p>
+</div>
 
-<img id="headshot" src="/static/headshot.jpg">
-<p>Software Engineer in the San Francisco Bay Area, currently working at Oracle.</p>
+<div id="sub-pages" class="row" align="center">
+    <div class="col">
+        <h3><a href="/resume">Resume</a></h3>
+        <p>Past work experience and all that good stuff</p>
+    </div>
+    <div class="col">
+        <h3><a href="/projects">Projects</a></h3>
+        <p>Side projects I've published</p>
+    </div>
+    <div class="col">
+        <h3><a href="/contact">Contact</a></h3>
+        <p>Ways to reach me</p>
+    </div>
+</div>
 {% endblock %}
