@@ -205,7 +205,11 @@ def _espn_guess_team(team_column, game):
     # Get long name here since short names aren't consistent ( thanks ESPN )
     long_name = short_name_matcher.group('long_name')
     long_name = ' '.join(i.capitalize() for i in long_name.split('-'))
-    return Team.objects.filter(name=long_name, year=game.date.year).first()
+    team_year = game.date.year
+    # If october of later, assume season ends next year
+    if game.date.month > 9:
+        team_year += 1
+    return Team.objects.filter(name=long_name, year=team_year).first()
 
 def _apply_quarter_subs(quarter_sub, away_roster, home_roster, away_players, home_players):
     sub_match = re.match(ESPN_SUB_REGEX, quarter_sub)

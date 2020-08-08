@@ -9,6 +9,7 @@ RUN apt-get update
 RUN apt-get install -y \
    cron \
    firefox \
+   jq \
    libmysqlclient-dev \
    logrotate \
    nginx \
@@ -24,8 +25,8 @@ RUN apt-get install -y \
    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Setup gecko driver
-RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz -o /usr/local/lib/geckodriver
-RUN chmod +x /usr/local/lib/geckodriver
+RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz -O /tmp/geckodriver.tar.gz
+RUN tar -xvzf /tmp/geckodriver.tar.gz -C /usr/local/bin/
 
 # Make directories
 RUN mkdir -p /opt/website/ /var/log/website/
@@ -42,7 +43,8 @@ COPY files/etc/cron.hourly/logrotate /etc/cron.hourly/logrotate
 # Run any needed chowns and chmods
 RUN chown -R www-data: /opt/website/
 RUN chmod +x /usr/local/bin/gunicorn-start.sh \
-    /etc/cron.hourly/logrotate
+    /etc/cron.hourly/logrotate \
+    /usr/local/bin/geckodriver
 
 # Setup logrotate files
 RUN sed -i 's/su root syslog/su root adm/' /etc/logrotate.conf
