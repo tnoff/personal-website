@@ -8,7 +8,7 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from basketball.management.urls import box_scores
-from basketball.models import Game, GameRoster, Player, Team
+from basketball.models import Game, Team
 from basketball.test_data.box import DATA as box_data
 from basketball.test_data.box_scores import DATA as box_score_data
 
@@ -41,7 +41,3 @@ class GetBoxScoresTest(TestCase):
         self.assertEqual(len(games), 1)
         teams = Team.objects.all()
         self.assertEqual(len(teams), 2)
-        rosters = GameRoster.objects.all()
-        self.assertEqual(len(rosters), 2)
-        players = Player.objects.all()
-        self.assertEqual(len(players), 26)
