@@ -38,13 +38,11 @@ COPY files/etc/supervisor/conf.d/supervisord.conf /etc/supervisor/conf.d/supervi
 COPY files/usr/local/bin/gunicorn-start.sh /usr/local/bin/gunicorn-start.sh
 COPY files/etc/gunicorn.conf /etc/gunicorn.conf
 COPY files/etc/logrotate.d/website /etc/logrotate.d/website
-COPY files/etc/cron.hourly/logrotate /etc/cron.hourly/logrotate
 COPY files/etc/cron.daily/process_scores /etc/cron.daily/process_scores
 
 # Run any needed chowns and chmods
 RUN chown -R www-data: /opt/website/
 RUN chmod +x /usr/local/bin/gunicorn-start.sh \
-    /etc/cron.hourly/logrotate \
     /etc/cron.daily/process_scores \
     /usr/local/bin/geckodriver
 
