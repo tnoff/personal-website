@@ -1,5 +1,0 @@
-#!/bin/sh
-
-python3 /opt/website/manage.py gather_scores  $(date +%Y) --months $(date +%B | sed -e 's/\(.*\)/\L\1/') > /tmp/scores.json
-python3 /opt/website/manage.py process_scores $(cat /tmp/scores.json | jq -r '.[]')
-python3 /opt/website/manage.py process_stats $(date +%Y)
