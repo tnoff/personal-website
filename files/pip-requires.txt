@@ -1,9 +1,7 @@
 Django>=2.2.9
 gunicorn>=20.0.4
 mysqlclient>=1.4.6
-# Currently django-otp needs to be pinned
-# https://github.com/Bouke/django-two-factor-auth/issues/335
-django-otp==0.7.5
+django-otp>=0.8.0
 django-two-factor-auth>=1.10.0
 phonenumbers>=8.11.4
 Pillow>=7.0.0
