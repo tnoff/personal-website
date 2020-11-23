@@ -24,7 +24,7 @@ LOGGING = {
         },
         'rotated_logs': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/home/tnorth/code/website/website.log',
+            'filename': '/home/tnorth/Code/website/website.log',
             'maxBytes': 1024 * 1024 * 5,  # 5 MB
             'backupCount': 5,
             'formatter': 'default',
