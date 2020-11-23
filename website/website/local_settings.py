@@ -4,7 +4,7 @@ DEBUG = True
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 STATICFILES_DIRS = [
-    '/home/tnorth/code/website/website/static',
+    '/home/tnorth/Code/website/website/static',
 ]
 
 LOGGING = {
