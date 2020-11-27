@@ -54,6 +54,13 @@ def task_create(request):
     '''
     Create new task
     '''
+    view_data = {
+        'operation': 'create',
+        'days_of_week': DAYS_OF_WEEK,
+        'week_offset_display': [num for num in range(1, 5)],
+        'month_offset_display': [num for num in range(7)],
+        'default_due_date': date.today().strftime('%Y-%m-%d'),
+    }
     if request.method == 'POST':
         form = TaskForm(request.POST)
         if form.is_valid():
@@ -65,9 +72,9 @@ def task_create(request):
             new_task = Task(**task_data)
             new_task.save()
             return HttpResponseRedirect('/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/')
-        return render(request, 'my_calendar/task_create.html',
-                      {'errors': form.errors})
-    return render(request, 'my_calendar/task_create.html')
+        view_data['errors'] = form.errors
+        return render(request, 'my_calendar/task.html', view_data)
+    return render(request, 'my_calendar/task.html', view_data)
 
 @otp_required
 def task_delete(_request, task_id):
@@ -83,61 +90,35 @@ def task_delete(_request, task_id):
 
 
 @otp_required
-def task_show(request, task_id):
+def task_update(request, task_id):
     '''
-    Show individual task
+    Update individual task
     '''
     task = Task.objects.get(id=task_id) #pylint:disable=no-member
     if not task:
         raise Http404(f'Unable to locate task id: {task_id}')
 
-    # If not delete show
-    try:
-        now = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
-    except AttributeError:
-        now = date.today()
-    task.time_delta = task.due_date - now
-    if task.time_delta.days < -1:
-        task.time_delta = f'{task.time_delta.days} days ago'
-    elif task.time_delta.days == -1:
-        task.time_delta = '1 day ago'
-    elif task.time_delta.days == 0:
-        task.time_delta = 'today'
-    elif task.time_delta.days == 1:
-        task.time_delta = 'tomorrow'
-    else:
-        task.time_delta = f'in {task.time_delta.days} days'
-    task.due_date = task.due_date.strftime("%B %d")
-
-    day_of_week = DAYS_OF_WEEK[task.day_of_week][1]
-
-    # Show 1st, 2nd, 3rd, or Nth week offset
-    if task.week_offset == 1:
-        # If month offset is 0, this is every week
-        if task.month_offset == 0:
-            task.week_offset = ''
-        else:
-            task.week_offset = 'on the 1st'
-    elif task.week_offset == 2:
-        task.week_offset = 'on the 2nd'
-    elif task.week_offset == 3:
-        task.week_offset = 'one the 3rd'
-    else:
-        task.week_offset = f'one the {task.week_offset}th'
-
-    # Show month, or multiple months
-    if task.month_offset == 0:
-        task.month_offset = ''
-    elif task.month_offset == 1:
-        task.month_offset = 'month,'
-    else:
-        task.month_offset = f'{task.month_offset} months,'
-
     view_data = {
-        'task' : task,
-        'day_of_week' : day_of_week,
+        'task': task,
+        'operation': 'update',
+        'days_of_week': DAYS_OF_WEEK,
+        'week_offset_display': [num for num in range(1, 5)],
+        'month_offset_display': [num for num in range(7)],
+        'default_due_date': task.due_date.strftime('%Y-%m-%d'),
     }
-    return render(request, 'my_calendar/task_show.html', view_data)
+
+    if request.method == 'POST':
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            for key, value in form.data.items():
+                if key == 'csrfmiddlewaretoken':
+                    continue
+                setattr(task, key, value)
+            task.save()
+            return HttpResponseRedirect('/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/')
+        view_data['errors'] = form.errors
+        return render(request, 'my_calendar/task.html', view_data)
+    return render(request, 'my_calendar/task.html', view_data)
 
 @otp_required
 def task_mark_done(request, task_id):

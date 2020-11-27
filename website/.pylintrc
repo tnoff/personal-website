@@ -6,3 +6,4 @@ ignore=migrations
 [messages control]
 disable=missing-module-docstring,
         too-few-public-methods,
+        unnecessary-comprehension,

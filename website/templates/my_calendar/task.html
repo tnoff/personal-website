@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Custom CSS Styles -->
+<style type="text/css">
+    #error-list{
+        color: red
+    }
+</style>
+<h2 align="center">Task Create</h2>
+
+<p>{{errors}}</p>
+
+<div align="center">
+    {% if operation == 'create' %}
+    <form action="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/create/" method="post">
+    {% else %}
+    <form action="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/{{task.id}}/" method="post">
+    {% endif %}
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="message">Message</label>
+            {% if operation == 'create' %}
+            <input id="message" type="text" maxlength="255" name="message">
+            {% else %}
+            <input id="message" type="text" maxlength="255" name="message" value="{{task.message}}">
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="day_of_week">Day of Week</label>
+            <select class="form-control" name="day_of_week" id="day_of_week">
+                {% for day in days_of_week %}
+                {% if operation != 'create' and task.day_of_week == day.0 %}
+                <option value={{day.0}} selected>{{day.1}}</option>
+                {% else %}
+                <option value={{day.0}}>{{day.1}}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="week_offset">On the Xth Week</label>
+            <select class="form-control" name="week_offset" id="week_offset">
+                {% for week in week_offset_display %}
+                {% if operation != 'create' and task.week_offset == week %}
+                <option value={{week}} selected>{{week}}</option>
+                {% else %}
+                <option value={{week}}>{{week}}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="month_offset">Off every Y Month</label>
+            <select class="form-control" name="month_offset" id="month_offset">
+                {% for month in month_offset_display %}
+                {% if operation != 'create' and task.month_offset == month %}
+                <option value={{month}} selected>{{month}}</option>
+                {% else %}
+                <option value={{month}}>{{month}}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="due_date">Due Date</label>
+            <input type="date" id="due_date" name="due_date" value={{default_due_date}}>
+        </div>
+        <button type="submit" class="btn btn-primary">
+            {% if operation == 'create' %}
+            Create
+            {% else %}
+            Update
+            {% endif %}
+        </button>
+    </form>
+</div>
+{% endblock %}
