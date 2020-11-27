@@ -7,8 +7,8 @@ from django.shortcuts import redirect, render
 from django_otp.decorators import otp_required
 
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
-from my_calendar.forms import TaskForm
-from my_calendar.models import Event, Person, Task
+from my_calendar.forms import GroupForm, PersonForm, TaskForm
+from my_calendar.models import Event, Group, Person, Task
 from my_calendar.utils import get_today_with_timezone
 from my_calendar.utils import get_time_view, find_next_due_date
 
@@ -108,7 +108,7 @@ def task_update(request, task_id):
     }
 
     if request.method == 'POST':
-        form = TaskForm(request.POST)
+        form = TaskForm(request.POST, instance=task)
         if form.is_valid():
             for key, value in form.data.items():
                 if key == 'csrfmiddlewaretoken':
@@ -154,7 +154,98 @@ def task_mark_done(request, task_id):
 #
 
 @otp_required
-def persons(request):
+def person_create(request):
+    '''
+    Create new person
+    '''
+    view_data = {
+        'operation': 'create',
+        'possible_groups': [(group.id, group.name) for group in Group.objects.all()], #pylint:disable=no-member
+    }
+    if request.method == 'POST':
+        # TODO find out why form isnt getting all groups here properly
+        groups = [int(group) for group in request.POST.getlist('groups')] or []
+        form = PersonForm(request.POST)
+        if form.is_valid():
+            person_data = {}
+            for key, value in form.data.items():
+                if key == 'csrfmiddlewaretoken':
+                    continue
+                if key == 'groups':
+                    continue
+                if value == '':
+                    continue
+                person_data[key] = value
+            new_person = Person(**person_data)
+            new_person.save()
+            new_person.groups.set(groups)
+            new_person.save()
+            return HttpResponseRedirect('/e37047af-f536-423e-8a72-731cbced13ea/')
+        view_data['errors'] = form.errors
+        return render(request, 'my_calendar/person.html', view_data)
+    return render(request, 'my_calendar/person.html', view_data)
+
+@otp_required
+def person_update(request, person_id):
+    '''
+    Update existing person
+    '''
+    person = Person.objects.get(id=person_id) #pylint:disable=no-member
+    if not person:
+        raise Http404(f'Unable to locate person id: {person_id}')
+
+    # Set non values to blank strings for form
+    if not person.phone_number:
+        person.phone_number = ''
+    if not person.birthday:
+        person.birthday = ''
+
+    # Make sure birthday in proper form format
+    if person.birthday:
+        person.birthday = person.birthday.strftime('%Y-%m-%d')
+    # Get group ids for form
+    person.group_ids = [group.id for group in person.groups.all()]
+
+    view_data = {
+        'operation': 'update',
+        'person': person,
+        'possible_groups': [(group.id, group.name) for group in Group.objects.all()], #pylint:disable=no-member
+    }
+    if request.method == 'POST':
+        # TODO find out why form isnt getting all groups here properly
+        groups = [int(group) for group in request.POST.getlist('groups')] or []
+        form = PersonForm(request.POST, instance=person)
+        if form.is_valid():
+            for key, value in form.data.items():
+                if key == 'csrfmiddlewaretoken':
+                    continue
+                if key == 'groups':
+                    continue
+                if value == '':
+                    continue
+                setattr(person, key, value)
+            person.save()
+            person.groups.set(groups)
+            person.save()
+            return HttpResponseRedirect('/e37047af-f536-423e-8a72-731cbced13ea/')
+        view_data['errors'] = form.errors
+        return render(request, 'my_calendar/person.html', view_data)
+    return render(request, 'my_calendar/person.html', view_data)
+
+@otp_required
+def person_delete(_request, person_id):
+    '''
+    Delete individual person
+    '''
+    person = Person.objects.get(id=person_id) #pylint:disable=no-member
+    if not person:
+        raise Http404(f'Unable to locate person id:{person_id}')
+
+    person.delete()
+    return HttpResponseRedirect('/e37047af-f536-423e-8a72-731cbced13ea/')
+
+@otp_required
+def people_list(request):
     '''
     Show all persons with phone numbers and birthdays
     '''
@@ -180,39 +271,59 @@ def persons(request):
             people = people | Person.objects.filter(groups__name=group) #pylint:disable=no-member
 
 
-    birthday_persons = []
-    past_birthdays = []
-    no_birthdays = []
-    for person in people.order_by('birthday'):
+    for person in people:
         person.group_names = [group.name for group in person.groups.all()]
-        if person.birthday:
-            person.birthday_string = person.birthday.strftime("%B %d")
-            person.birthday_delta = (person.birthday - today).days
-            # If delta is not negative add to list, else add to append list
-            if (person.birthday - today).days < 0:
-                birthday_next_year = date(person.birthday.year + 1,
-                                          person.birthday.month,
-                                          person.birthday.day)
-                person.birthday_delta = (birthday_next_year - today).days
-                past_birthdays.append(person)
-            else:
-                birthday_persons.append(person)
-        else:
-            # Keep this last so the folks with no bdays go in the append last list
-            no_birthdays.append(person)
         if person.phone_number:
             phone_number_string = '%s (%s) %s-%s' % (person.phone_number[:-10],
                                                      person.phone_number[-10:-7],
                                                      person.phone_number[-7:-4],
                                                      person.phone_number[-4:])
             person.phone_number = phone_number_string
-
-    person_list = birthday_persons + past_birthdays + no_birthdays
+        if person.birthday:
+            person.birthday = person.birthday.strftime('%B %d')
 
     view_data = {
-        'persons' : person_list,
+        'people' : people,
     }
-    return render(request, 'my_calendar/persons.html', view_data)
+    return render(request, 'my_calendar/people_list.html', view_data)
+
+#
+# Group Methods
+#
+
+@otp_required
+def group_create(request):
+    '''
+    Create new Group
+    '''
+    view_data = {
+        'operation': 'create',
+        'possible_people': [(person.id, person.name) for person in Person.objects.all()], #pylint:disable=no-member
+    }
+    if request.method == 'POST':
+        # TODO find out why form isnt getting all persons here properly
+        people = [int(person) for person in request.POST.getlist('people')] or []
+        form = GroupForm(request.POST)
+        if form.is_valid():
+            group_data = {}
+            for key, value in form.data.items():
+                if key == 'csrfmiddlewaretoken':
+                    continue
+                if key == 'people':
+                    continue
+                group_data[key] = value
+            new_group = Group (**group_data)
+            new_group.save()
+            for person in people:
+                person = Person.objects.get(id=person) #pylint:disable=no-member
+                person.groups.add(new_group)
+                person.save()
+            return HttpResponseRedirect('/e37047af-f536-423e-8a72-731cbced13ea/'\
+                                        f'?groups={new_group.name}')
+        view_data['errors'] = form.errors
+        return render(request, 'my_calendar/group.html', view_data)
+    return render(request, 'my_calendar/group.html', view_data)
+
 
 #
 # Event Method
@@ -264,7 +375,7 @@ class Day():
             self.events.append(item)
 
 @otp_required
-def calendar(request, year=None, month=None):
+def calendar(request, year=None, month=None): #pylint:disable=too-many-locals
     '''
     Calednar view with birthdays and tasks
     '''

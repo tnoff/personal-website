@@ -7,3 +7,4 @@ ignore=migrations
 disable=missing-module-docstring,
         too-few-public-methods,
         unnecessary-comprehension,
+        fixme,

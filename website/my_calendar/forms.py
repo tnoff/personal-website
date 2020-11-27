@@ -4,7 +4,7 @@ import string
 from django import forms
 
 from my_calendar.constants import DAYS_OF_WEEK
-from my_calendar.models import Event, Person, Task
+from my_calendar.models import Event, Group, Person, Task
 
 # https://stackoverflow.com/questions/16699007/regular-expression-to-match-standard-10-digit-phone-number
 PHONE_NUMBER_REGEX = r'^(\+?\d{1,2})?(\s)?\(?\d{3}\)?([\s.-])?\d{3}([\s.-])?\d{4}'
@@ -37,6 +37,17 @@ class PersonForm(forms.ModelForm):
         if len(just_digits) == 10:
             return f'+1{just_digits}'
         return f'+{just_digits}'
+
+class GroupForm(forms.ModelForm):
+    '''
+    Form for group model
+    '''
+    class Meta:
+        '''
+        Needed for form
+        '''
+        model = Group
+        fields = '__all__'
 
 class EventForm(forms.ModelForm):
     '''
