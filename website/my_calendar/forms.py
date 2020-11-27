@@ -1,3 +1,4 @@
+from datetime import date
 import re
 import string
 
@@ -5,6 +6,7 @@ from django import forms
 
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
 from my_calendar.models import Event, Person, Task
+from my_calendar.utils import find_next_due_date
 
 # https://stackoverflow.com/questions/16699007/regular-expression-to-match-standard-10-digit-phone-number
 PHONE_NUMBER_REGEX = '^(\+?\d{1,2})?(\s)?\(?\d{3}\)?([\s.-])?\d{3}([\s.-])?\d{4}'
@@ -18,7 +20,7 @@ class PersonForm(forms.ModelForm):
             return
         matcher = re.match(PHONE_NUMBER_REGEX, self.cleaned_data['phone_number'])
         if not matcher:
-            raise forms.ValidationError("Invalid number, does not match regex %s" % PHONE_NUMBER_REGEX)
+            raise forms.ValidationError(f'Invalid number, does not match regex {PHONE_NUMBER_REGEX}')
         just_digits = ''.join(digit for digit in self.cleaned_data['phone_number'] if digit in string.digits)
         # If only 10 digits given, assume its a use code
         if len(just_digits) == 10:

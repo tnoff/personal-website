@@ -3,13 +3,16 @@ from datetime import date, datetime, timedelta
 import pytz
 
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django_otp.decorators import otp_required
 from django.utils import timezone
 
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
+from my_calendar.forms import TaskForm
 from my_calendar.models import Event, Person, Task, WebsiteUserSettings
+from my_calendar.utils import get_time_view, find_next_due_date
+
 
 def _get_today_with_timezone(request):
     try:
@@ -29,49 +32,6 @@ def _update_past_birthdays(today=None, delta=31):
     for person in past_bdays:
         person.birthday = date(today.year + 1, person.birthday.month, person.birthday.day)
         person.save()
-
-def get_time_view(item):
-    item.time_string = ''
-    if item.start.hour < 10:
-        item.time_string = f'{item.time_string}0'
-    item.time_string = f'{item.time_string}{item.start.hour}:'
-    if item.start.minute < 10:
-        item.time_string = f'{item.time_string}0'
-    item.time_string = f'{item.time_string}{item.start.minute}-'
-    if item.end.hour < 10:
-        item.time_string = f'{item.time_string}0'
-    item.time_string = f'{item.time_string}{item.end.hour}:'
-    if item.end.minute < 10:
-        item.time_string = f'{item.time_string}0'
-    item.time_string = f'{item.time_string}{item.end.minute}'
-    return item
-
-
-def _find_next_due_date(task, start):
-    task.time_delta = task.due_date - start
-    # If task is not done, then it is overdue
-    while task.time_delta.days < 0:
-        # First add month offset
-        next_year = task.due_date.year
-        next_month = task.due_date.month + task.month_offset
-        if next_month > 12:
-            next_year += 1
-            next_month -= 12
-
-        # Use start date of 1 if new month
-        if task.due_date.month != next_month:
-            task.due_date = date(next_year, next_month, 1)
-        # Else just add one to date
-        else:
-            task.due_date += timedelta(1)
-        # Go to first day that matches week day
-        while task.due_date.weekday() != task.day_of_week:
-            task.due_date += timedelta(1)
-        # Now add proper week offset
-        task.due_date += timedelta(7 * (task.week_offset - 1))
-        # Check again if before todays date
-        task.time_delta = task.due_date - start
-
 
 class Day():
     def __init__(self, datetime_date, today, timezone=None):
@@ -163,6 +123,26 @@ def task_list(request):
     return render(request, 'my_calendar/task_list.html', view_data)
 
 @otp_required
+def task_create(request):
+    '''
+    Create new task
+    '''
+    if request.method == 'POST':
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            task_data = {}
+            for key, value in form.data.items():
+                if key == 'csrfmiddlewaretoken':
+                    continue
+                task_data[key] = value
+            new_task = Task(**task_data)
+            new_task.save()
+            return HttpResponseRedirect('/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/')
+        return render(request, 'my_calendar/task_create.html',
+                      {'errors': form.errors})
+    return render(request, 'my_calendar/task_create.html')
+
+@otp_required
 def task_show(request, task_id):
     '''
     Show individual task
@@ -225,10 +205,18 @@ def task_mark_done(request, task_id):
         raise Http404(f'Unable to locate task')
     # If past due date, use today
     if task.due_date < now:
-         _find_next_due_date(task, now)
+        task.due_date = find_next_due_date(task.month_offset,
+                                           task.week_offset,
+                                           task.day_of_week,
+                                           now,
+                                           due_date=task.due_date)
     # If due date in future, use due date to calculate
     else:
-        _find_next_due_date(task, task.due_date + timedelta(1))
+        task.due_date = find_next_due_date(task.month_offset,
+                                           task.week_offset,
+                                           task.day_of_week,
+                                           task.due_date + timedelta(1),
+                                           due_date=task.due_date)
     task.save()
     return redirect('/0d27c6b9-a5d7-4782-9438-93b54b8f98f8')
 
