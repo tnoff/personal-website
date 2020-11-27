@@ -9,6 +9,7 @@
             <th scope="col">Next Due</th>
             <th scope="col">Days Until</th>
             <th></th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -21,6 +22,12 @@
                 <form action="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/{{task.id}}/done" method="post">
                     {% csrf_token %}
                     <button name="mark_done" value="{{task.id}}" type="submit" class="btn btn-success">Mark Done</button>
+                </form>
+            </td>
+            <td>
+                <form action="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/{{task.id}}/delete" method="get">
+                    {% csrf_token %}
+                    <button name="delete" value="{{task.id}}" type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </td>
         </tr>

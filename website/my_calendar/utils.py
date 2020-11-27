@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import date, timedelta
 
 def get_time_view(item):
     item.time_string = ''

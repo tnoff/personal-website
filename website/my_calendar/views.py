@@ -143,14 +143,29 @@ def task_create(request):
     return render(request, 'my_calendar/task_create.html')
 
 @otp_required
+def task_delete(request, task_id):
+    '''
+    Delete individual task
+    '''
+    task = Task.objects.get(id=task_id)
+    if not task:
+        raise Http404(f'Unable to locate task')
+
+    task.delete()
+    return HttpResponseRedirect('/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/')
+
+
+@otp_required
 def task_show(request, task_id):
     '''
     Show individual task
     '''
-    now = _get_today_with_timezone(request)
     task = Task.objects.get(id=task_id)
     if not task:
         raise Http404(f'Unable to locate task')
+
+    # If not delete show
+    now = _get_today_with_timezone(request)
     task.time_delta = task.due_date - now
     if task.time_delta.days < -1:
         task.time_delta = f'{task.time_delta.days} days ago'
