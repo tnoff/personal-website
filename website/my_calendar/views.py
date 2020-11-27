@@ -1,25 +1,16 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 import pytz
 
-from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django_otp.decorators import otp_required
-from django.utils import timezone
 
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
 from my_calendar.forms import TaskForm
-from my_calendar.models import Event, Person, Task, WebsiteUserSettings
+from my_calendar.models import Event, Person, Task
+from my_calendar.utils import get_today_with_timezone
 from my_calendar.utils import get_time_view, find_next_due_date
-
-
-def _get_today_with_timezone(request):
-    try:
-        tz = pytz.timezone(request.user.websiteusersettings.timezone.zone)
-        return datetime.now(tz).date()
-    except AttributeError:
-        return datetime.now().date()
 
 def _update_past_birthdays(today=None, delta=31):
     '''
@@ -27,91 +18,27 @@ def _update_past_birthdays(today=None, delta=31):
     Delta: Offset when to rotate birthdays
     '''
     if today is None:
-        today = _get_today_with_timezone(request)
-    past_bdays = Person.objects.filter(birthday__lt=(today - timedelta(delta)))
+        today = date.today()
+    past_bdays = Person.objects.filter(birthday__lt=(today - timedelta(delta))) #pylint:disable=no-member
     for person in past_bdays:
         person.birthday = date(today.year + 1, person.birthday.month, person.birthday.day)
         person.save()
 
-class Day():
-    def __init__(self, datetime_date, today, timezone=None):
-        self.datetime_date = datetime_date
-        self.is_today = datetime_date == today
-        self.birthdays = [item.name for item in Person.objects.filter(birthday=datetime_date)]
-        self.tasks = [item for item in Task.objects.filter(due_date=datetime_date)]
-        self.events = []
-        for item in Event.objects.filter(start__range=[datetime_date, datetime_date + timedelta(days=1)]):
-            if timezone:
-                item.start = item.start.astimezone(timezone)
-                item.end = item.end.astimezone(timezone)
-            item = get_time_view(item)
-            self.events.append(item)
+#
+# Task Methods
+#
 
-@otp_required
-def persons(request):
-    '''
-    Show all persons with phone numbers and birthdays
-    '''
-    # Only show given groups
-    groups = request.GET.get('groups', '')
-    if groups:
-        groups = groups.split(',')
-
-    today = _get_today_with_timezone(request)
-    _update_past_birthdays(today=today)
-
-    # If no groups, get all people
-    if not groups:
-        persons = Person.objects.all()
-    # Else iterate through all groups
-    else:
-        # Use first group to create first queryset
-        persons = Person.objects.filter(groups__name=groups[0])
-        for group in groups[1:]:
-            persons = persons | Person.objects.filter(groups__name=group)
-
-
-    birthday_persons = []
-    past_birthdays = []
-    no_birthdays = []
-    for person in persons.order_by('birthday'):
-        person.group_names = [group.name for group in person.groups.all()]
-        if person.birthday:
-            person.birthday_string = person.birthday.strftime("%B %d")
-            person.birthday_delta = (person.birthday - today).days
-            # If delta is not negative add to list, else add to append list
-            if (person.birthday - today).days < 0:
-                birthday_next_year = date(person.birthday.year + 1,
-                                          person.birthday.month,
-                                          person.birthday.day)
-                person.birthday_delta = (birthday_next_year - today).days
-                past_birthdays.append(person)
-            else:
-                birthday_persons.append(person)
-        else:
-            # Keep this last so the folks with no bdays go in the append last list
-            no_birthdays.append(person)
-        if person.phone_number:
-            phone_number_string = '%s (%s) %s-%s' % (person.phone_number[:-10],
-                                                     person.phone_number[-10:-7],
-                                                     person.phone_number[-7:-4],
-                                                     person.phone_number[-4:])
-            person.phone_number = phone_number_string
-
-    person_list = birthday_persons + past_birthdays + no_birthdays
-
-    view_data = {
-        'persons' : person_list,
-    }
-    return render(request, 'my_calendar/persons.html', view_data)
 
 @otp_required
 def task_list(request):
     '''
     Show tasks as a sorted list
     '''
-    now = _get_today_with_timezone(request)
-    tasks = Task.objects.all()
+    try:
+        now = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
+    except AttributeError:
+        now = date.today()
+    tasks = Task.objects.all() #pylint:disable=no-member
     for task in tasks:
         task.time_delta = task.due_date - now
         task.due_date_no_year = task.due_date.strftime("%B %d")
@@ -143,13 +70,13 @@ def task_create(request):
     return render(request, 'my_calendar/task_create.html')
 
 @otp_required
-def task_delete(request, task_id):
+def task_delete(_request, task_id):
     '''
     Delete individual task
     '''
-    task = Task.objects.get(id=task_id)
+    task = Task.objects.get(id=task_id) #pylint:disable=no-member
     if not task:
-        raise Http404(f'Unable to locate task')
+        raise Http404(f'Unable to locate task id:{task_id}')
 
     task.delete()
     return HttpResponseRedirect('/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/')
@@ -160,12 +87,15 @@ def task_show(request, task_id):
     '''
     Show individual task
     '''
-    task = Task.objects.get(id=task_id)
+    task = Task.objects.get(id=task_id) #pylint:disable=no-member
     if not task:
-        raise Http404(f'Unable to locate task')
+        raise Http404(f'Unable to locate task id: {task_id}')
 
     # If not delete show
-    now = _get_today_with_timezone(request)
+    try:
+        now = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
+    except AttributeError:
+        now = date.today()
     task.time_delta = task.due_date - now
     if task.time_delta.days < -1:
         task.time_delta = f'{task.time_delta.days} days ago'
@@ -193,7 +123,7 @@ def task_show(request, task_id):
     elif task.week_offset == 3:
         task.week_offset = 'one the 3rd'
     else:
-        task.week_offset = f'one the {task.week_offset}th' 
+        task.week_offset = f'one the {task.week_offset}th'
 
     # Show month, or multiple months
     if task.month_offset == 0:
@@ -214,10 +144,13 @@ def task_mark_done(request, task_id):
     '''
     API call to mark task as done
     '''
-    now = _get_today_with_timezone(request)
-    task = Task.objects.get(id=task_id)
+    try:
+        now = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
+    except AttributeError:
+        now = date.today()
+    task = Task.objects.get(id=task_id) #pylint:disable=no-member
     if not task:
-        raise Http404(f'Unable to locate task')
+        raise Http404(f'Unable to locate task id: {task_id}')
     # If past due date, use today
     if task.due_date < now:
         task.due_date = find_next_due_date(task.month_offset,
@@ -235,18 +168,135 @@ def task_mark_done(request, task_id):
     task.save()
     return redirect('/0d27c6b9-a5d7-4782-9438-93b54b8f98f8')
 
+#
+# Person Methods
+#
+
+@otp_required
+def persons(request):
+    '''
+    Show all persons with phone numbers and birthdays
+    '''
+    # Only show given groups
+    groups = request.GET.get('groups', '')
+    if groups:
+        groups = groups.split(',')
+
+    try:
+        today = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
+    except AttributeError:
+        today = date.today()
+    _update_past_birthdays(today=today)
+
+    # If no groups, get all people
+    if not groups:
+        people = Person.objects.all() #pylint:disable=no-member
+    # Else iterate through all groups
+    else:
+        # Use first group to create first queryset
+        people = Person.objects.filter(groups__name=groups[0]) #pylint:disable=no-member
+        for group in groups[1:]:
+            people = people | Person.objects.filter(groups__name=group) #pylint:disable=no-member
+
+
+    birthday_persons = []
+    past_birthdays = []
+    no_birthdays = []
+    for person in people.order_by('birthday'):
+        person.group_names = [group.name for group in person.groups.all()]
+        if person.birthday:
+            person.birthday_string = person.birthday.strftime("%B %d")
+            person.birthday_delta = (person.birthday - today).days
+            # If delta is not negative add to list, else add to append list
+            if (person.birthday - today).days < 0:
+                birthday_next_year = date(person.birthday.year + 1,
+                                          person.birthday.month,
+                                          person.birthday.day)
+                person.birthday_delta = (birthday_next_year - today).days
+                past_birthdays.append(person)
+            else:
+                birthday_persons.append(person)
+        else:
+            # Keep this last so the folks with no bdays go in the append last list
+            no_birthdays.append(person)
+        if person.phone_number:
+            phone_number_string = '%s (%s) %s-%s' % (person.phone_number[:-10],
+                                                     person.phone_number[-10:-7],
+                                                     person.phone_number[-7:-4],
+                                                     person.phone_number[-4:])
+            person.phone_number = phone_number_string
+
+    person_list = birthday_persons + past_birthdays + no_birthdays
+
+    view_data = {
+        'persons' : person_list,
+    }
+    return render(request, 'my_calendar/persons.html', view_data)
+
+#
+# Event Method
+#
+
+@otp_required
+def event_show(request, event_id):
+    '''
+    Show full info for given event
+    '''
+    event = Event.objects.get(pk=event_id) #pylint:disable=no-member
+    if not event:
+        raise Http404(f'Unable to locate event id: {event_id}')
+    try:
+        timezone = pytz.timezone(request.user.websiteusersettings.timezone.zone)
+        event.start = event.start.astimezone(timezone)
+        event.end = event.end.astimezone(timezone)
+    except AttributeError:
+        pass
+
+    event = get_time_view(event)
+    view_data = {
+        'event': event,
+    }
+
+    return render(request, 'my_calendar/event_show.html', view_data)
+
+#
+# Calendar Display
+#
+
+class Day():
+    '''
+    Day object to keep trakc of birthdays and events per day
+    '''
+    def __init__(self, datetime_date, today, timezone=None):
+        self.datetime_date = datetime_date
+        self.is_today = datetime_date == today
+        self.birthdays = [item.name for item in Person.objects.filter(birthday=datetime_date)] #pylint:disable=no-member
+        self.tasks = Task.objects.filter(due_date=datetime_date) #pylint:disable=no-member
+        self.events = []
+        day_events = Event.objects.filter(start__range=[datetime_date, #pylint:disable=no-member
+                                                        datetime_date + timedelta(days=1)])
+        for item in day_events:
+            if timezone:
+                item.start = item.start.astimezone(timezone)
+                item.end = item.end.astimezone(timezone)
+            item = get_time_view(item)
+            self.events.append(item)
+
 @otp_required
 def calendar(request, year=None, month=None):
     '''
     Calednar view with birthdays and tasks
     '''
     # Get date from defaults
-    today = _get_today_with_timezone(request)
+    try:
+        today = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
+    except AttributeError:
+        today = date.today()
     _update_past_birthdays(today=today)
     try:
-        tz = pytz.timezone(request.user.websiteusersettings.timezone.zone)
+        timezone = pytz.timezone(request.user.websiteusersettings.timezone.zone)
     except AttributeError:
-        tz = None
+        timezone = None
 
     try:
         year = int(year)
@@ -282,7 +332,7 @@ def calendar(request, year=None, month=None):
         week_row.append(None)
     # Iterate through all month days
     while datetime_day.month == month:
-        day_object = Day(datetime_day, today, timezone=tz)
+        day_object = Day(datetime_day, today, timezone=timezone)
         week_row.append(day_object)
         if datetime_day.weekday() == 6:
             week_table_rows.append(week_row)
@@ -303,25 +353,3 @@ def calendar(request, year=None, month=None):
         'week_table_rows' : week_table_rows,
     }
     return render(request, 'my_calendar/calendar.html', view_data)
-
-@otp_required
-def event_show(request, event_id):
-    '''
-    Show full info for given event
-    '''
-    event = Event.objects.get(pk=event_id)
-    if not event:
-        raise Http404(f'Unable to locate event')
-    try:
-        tz = pytz.timezone(request.user.websiteusersettings.timezone.zone)
-        event.start = event.start.astimezone(tz)
-        event.end = event.end.astimezone(tz)
-    except AttributeError:
-        pass
-
-    event = get_time_view(event)
-    view_data = {
-        'event': event,
-    }
-
-    return render(request, 'my_calendar/event_show.html', view_data)

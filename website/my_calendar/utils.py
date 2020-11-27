@@ -1,6 +1,12 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+
+import pytz
 
 def get_time_view(item):
+    '''
+    For given item with start and end, print nice timestamp
+    Example: 01:20-03:20
+    '''
     item.time_string = ''
     if item.start.hour < 10:
         item.time_string = f'{item.time_string}0'
@@ -52,3 +58,9 @@ def find_next_due_date(month_offset, week_offset, day_of_week, start, due_date=N
         # Check again if before todays date
         time_delta = due_date - start
     return due_date
+
+def get_today_with_timezone(zone):
+    '''
+    Get current date within timezone
+    '''
+    return datetime.now(pytz.timezone(zone)).date()

@@ -1,0 +1,8 @@
+[MASTER]
+ignore=migrations
+
+[TYPECHECK]
+
+[messages control]
+disable=missing-module-docstring,
+        too-few-public-methods,

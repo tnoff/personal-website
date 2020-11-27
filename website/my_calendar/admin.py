@@ -4,19 +4,32 @@ from my_calendar.forms import EventForm, PersonForm, TaskForm
 from my_calendar.models import Event, Group, Person, Task, WebsiteUserSettings
 
 class EventAdmin(admin.ModelAdmin):
+    '''
+    Admin for Event Model
+    '''
     form = EventForm
 
 class PersonAdmin(admin.ModelAdmin):
+    '''
+    Admin for Person Model
+    '''
     form = PersonForm
 
 class TaskAdmin(admin.ModelAdmin):
+    '''
+    Admin for Task Model
+    '''
     form = TaskForm
 
 class GroupAdmin(admin.ModelAdmin):
-    pass
+    '''
+    Admin for Group Model
+    '''
 
 class WebsiteUserSettingsAdmin(admin.ModelAdmin):
-    pass
+    '''
+    Admin for Website Settings Model
+    '''
 
 admin.site.register(Event, EventAdmin)
 admin.site.register(Person, PersonAdmin)
