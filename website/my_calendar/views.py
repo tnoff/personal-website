@@ -2,6 +2,7 @@ from datetime import date, timedelta
 
 import pytz
 
+from django.core.paginator import Paginator
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django_otp.decorators import otp_required
@@ -249,6 +250,8 @@ def people_list(request):
     '''
     Show all persons with phone numbers and birthdays
     '''
+    page_number = request.GET.get('page')
+
     # Only show given groups
     groups = request.GET.get('groups', '')
     if groups:
@@ -270,6 +273,9 @@ def people_list(request):
         for group in groups[1:]:
             people = people | Person.objects.filter(groups__name=group) #pylint:disable=no-member
 
+    # Limit 25 results per page
+    paginator = Paginator(people, 1)
+    people = paginator.get_page(page_number)
 
     for person in people:
         person.group_names = [group.name for group in person.groups.all()]
@@ -282,8 +288,15 @@ def people_list(request):
         if person.birthday:
             person.birthday = person.birthday.strftime('%B %d')
 
+    # Groups suffix for page links
+    if groups:
+        groups = f'&groups={",".join(group for group in groups)}'
+    else:
+        groups = ''
+
     view_data = {
         'people' : people,
+        'groups': groups,
     }
     return render(request, 'my_calendar/people_list.html', view_data)
 

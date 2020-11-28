@@ -41,6 +41,19 @@
     </tbody>
 </table>
 <div align="center">
+	<span class="step-link">
+		{% if people.has_previous %}
+            <a href="?page={{ people.previous_page_number }}{{groups}}">Previous Page</a>
+		{% endif %}
+		<span class="current">
+			Page {{ people.number }} of {{ people.paginator.num_pages }}
+		</span>
+		{% if people.has_next %}
+        <a href="?page={{ people.next_page_number }}{{groups}}">Next Page</a>
+		{% endif %}
+	</span>
+</div>
+<div align="center">
     <a href="/e37047af-f536-423e-8a72-731cbced13ea/create/">
         <button class="btn btn-primary">Add Person</button>
     </a>
