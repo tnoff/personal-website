@@ -274,7 +274,7 @@ def people_list(request):
             people = people | Person.objects.filter(groups__name=group) #pylint:disable=no-member
 
     # Limit 25 results per page
-    paginator = Paginator(people, 1)
+    paginator = Paginator(people, 25)
     people = paginator.get_page(page_number)
 
     for person in people:
