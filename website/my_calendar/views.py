@@ -3,6 +3,7 @@ from datetime import date, timedelta
 import pytz
 
 from django.core.paginator import Paginator
+from django.db.models.functions import Lower
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django_otp.decorators import otp_required
@@ -272,6 +273,8 @@ def people_list(request):
         people = Person.objects.filter(groups__name=groups[0]) #pylint:disable=no-member
         for group in groups[1:]:
             people = people | Person.objects.filter(groups__name=group) #pylint:disable=no-member
+
+    people = people.order_by(Lower('name'))
 
     # Limit 25 results per page
     paginator = Paginator(people, 25)
