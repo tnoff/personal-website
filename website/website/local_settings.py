@@ -4,7 +4,7 @@ DEBUG = True
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 STATICFILES_DIRS = [
-    '/home/tnorth/Code/website/website/static',
+    os.path.join(BASE_DIR, 'static'),
 ]
 
 LOGGING = {
@@ -24,7 +24,7 @@ LOGGING = {
         },
         'rotated_logs': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/home/tnorth/Code/website/website.log',
+            'filename': os.path.join(BASE_DIR, 'website.log'),
             'maxBytes': 1024 * 1024 * 5,  # 5 MB
             'backupCount': 5,
             'formatter': 'default',
