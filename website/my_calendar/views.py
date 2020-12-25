@@ -477,8 +477,15 @@ def calendar(request, year=None, month=None): #pylint:disable=too-many-locals
     # Start with beginning of week, even if previous month
     datetime_day = datetime_day - timedelta(datetime_day.weekday())
 
+    # End of month
+    try:
+        end_day = date(year, month +1, 1) - timedelta(days=1)
+    except ValueError:
+        # Assume next year
+        end_day = date(year + 1, 1, 1) - timedelta(days=1)
+
     # Iterate through all month days
-    while datetime_day.month <= month and datetime_day.year == year:
+    while datetime_day < end_day:
         day_object = Day(datetime_day, today, timezone=timezone)
         week_row.append(day_object)
         if datetime_day.weekday() == 6:
