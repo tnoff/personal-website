@@ -51,5 +51,12 @@ RUN chmod 0644 /etc/logrotate.d/website
 # Install packages
 RUN /usr/bin/pip3 install -r /tmp/pip-requires.txt
 
+# Show package versions
+RUN date -u && \
+    echo "Packages installed\n" && \
+    /usr/bin/dpkg -l && \
+    echo "Pip packages\n" && \
+    /usr/bin/pip3 freeze
+
 # Start supervisord
 CMD /usr/bin/supervisord -n
