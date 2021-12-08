@@ -66,7 +66,7 @@ class EventForm(forms.ModelForm):
         '''
         if self.cleaned_data['start'] > self.cleaned_data['end']:
             raise forms.ValidationError('Start of event must come before end')
-        if self.cleaned_data['end'].day != self.cleaned_data['start'].day:
+        if (self.cleaned_data['end'] - self.cleaned_data['start']).days > 0:
             raise forms.ValidationError('Events cannot span multiple days')
         return self.cleaned_data['end']
 

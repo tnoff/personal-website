@@ -4,23 +4,28 @@ import pytz
 
 def get_time_view(item):
     '''
-    For given item with start and end, print nice timestamp
-    Example: 01:20-03:20
+    If event is less than an hour, show minutes
+    If longer, show length in hours and minutes
     '''
-    item.time_string = ''
-    if item.start.hour < 10:
-        item.time_string = f'{item.time_string}0'
-    item.time_string = f'{item.time_string}{item.start.hour}:'
-    if item.start.minute < 10:
-        item.time_string = f'{item.time_string}0'
-    item.time_string = f'{item.time_string}{item.start.minute}-'
-    if item.end.hour < 10:
-        item.time_string = f'{item.time_string}0'
-    item.time_string = f'{item.time_string}{item.end.hour}:'
-    if item.end.minute < 10:
-        item.time_string = f'{item.time_string}0'
-    item.time_string = f'{item.time_string}{item.end.minute}'
-    return item
+    duration = item.end - item.start
+    if duration.seconds < 60 * 60:
+        return f'{int(duration.seconds / (60))} minutes'
+    hours = int(duration.seconds / ( 60 * 60))
+    minutes = int(duration.seconds % (60 * 60))
+    return f'{hours} hours and {minutes} minutes'
+
+def get_time_with_leading_zeros(datetime_obj):
+    '''
+    Get HH:MM with leading zeros
+    '''
+    time_string = ''
+    if datetime_obj.hour < 10:
+        time_string = f'{time_string}0'
+    time_string = f'{time_string}{datetime_obj.hour}:'
+    if datetime_obj.minute < 10:
+        time_string = f'{time_string}0'
+    time_string = f'{time_string}{datetime_obj.minute}'
+    return time_string
 
 def find_next_due_date(month_offset, week_offset, day_of_week, start, due_date=None):
     '''

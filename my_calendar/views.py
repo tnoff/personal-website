@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 import pytz
 
@@ -9,10 +9,10 @@ from django.shortcuts import redirect, render
 from django_otp.decorators import otp_required
 
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
-from my_calendar.forms import GroupForm, PersonForm, TaskForm
+from my_calendar.forms import EventForm, GroupForm, PersonForm, TaskForm
 from my_calendar.models import Event, Group, Person, Task
 from my_calendar.utils import get_today_with_timezone
-from my_calendar.utils import get_time_view, find_next_due_date
+from my_calendar.utils import get_time_view, find_next_due_date, get_time_with_leading_zeros
 
 def _update_past_birthdays(today=None, delta=31):
     '''
@@ -56,12 +56,16 @@ def task_create(request):
     '''
     Create new task
     '''
+    try:
+        now = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
+    except AttributeError:
+        now = date.today()
     view_data = {
         'operation': 'create',
         'days_of_week': DAYS_OF_WEEK,
         'week_offset_display': [num for num in range(1, 5)],
         'month_offset_display': [num for num in range(7)],
-        'default_due_date': date.today().strftime('%Y-%m-%d'),
+        'default_due_date': now.strftime('%Y-%m-%d'),
     }
     if request.method == 'POST':
         form = TaskForm(request.POST)
@@ -122,6 +126,7 @@ def task_update(request, task_id):
         return render(request, 'my_calendar/task.html', view_data)
     return render(request, 'my_calendar/task.html', view_data)
 
+# TODO just combine this with the update
 @otp_required
 def task_show(request, task_id):
     '''
@@ -390,26 +395,91 @@ def group_create(request):
 #
 
 @otp_required
-def event_show(request, event_id):
+def event_update(request, event_id):
     '''
     Show full info for given event
     '''
     event = Event.objects.get(pk=event_id) #pylint:disable=no-member
     if not event:
         raise Http404(f'Unable to locate event id: {event_id}')
-    try:
-        timezone = pytz.timezone(request.user.websiteusersettings.timezone.zone)
-        event.start = event.start.astimezone(timezone)
-        event.end = event.end.astimezone(timezone)
-    except AttributeError:
-        pass
+    return _generate_event(request, event, 'update')
 
-    event = get_time_view(event)
+@otp_required
+def event_create(request):
+    '''
+    Create new event
+    '''
+    return _generate_event(request, None, 'create')
+
+def _generate_event(request, event, operation):
     view_data = {
         'event': event,
+        'operation': 'update',
+    }
+    try:
+        timezone = pytz.timezone(request.user.websiteusersettings.timezone.zone)
+        now = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
+    except AttributeError:
+        now = date.today()
+
+    view_data = {
+        'event': event,
+        'operation': operation,
+        'default_date': now.strftime('%Y-%m-%d'),
     }
 
-    return render(request, 'my_calendar/event_show.html', view_data)
+    if request.method == 'POST':
+        form_data = dict(request.POST)
+        form_data['title'] = form_data.pop('title')[0]
+        form_data['description'] = form_data.pop('description')[0]
+        event_date = datetime.strptime(form_data.pop('event_date')[0], '%Y-%m-%d')
+        event_start_time = datetime.strptime(form_data.pop('start_time')[0], '%H:%M')
+        event_end_time = datetime.strptime(form_data.pop('end_time')[0], '%H:%M')
+        local_start = datetime(event_date.year, event_date.month, event_date.day,
+                               event_start_time.hour, event_start_time.minute)
+        local_end = datetime(event_date.year, event_date.month, event_date.day,
+                             event_end_time.hour, event_end_time.minute)
+        form_data['start'] = timezone.localize(local_start, is_dst=None).astimezone(pytz.utc)
+        form_data['end'] = timezone.localize(local_end, is_dst=None).astimezone(pytz.utc)
+        form = EventForm(form_data, instance=event)
+        if form.is_valid():
+            if event is not None:
+                event.save()
+                return HttpResponseRedirect('/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/')
+            event_data = {}
+            for key, value in form.data.items():
+                if key == 'csrfmiddlewaretoken':
+                    continue
+                if value == '':
+                    continue
+                event_data[key] = value
+            new_event = Event(**event_data)
+            new_event.save()
+            return HttpResponseRedirect(f'/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/{new_event.start.year}/{new_event.start.month}')
+        view_data['errors'] = form.errors
+
+    if operation == 'update':
+        try:
+            event.start = event.start.astimezone(timezone)
+            event.end = event.end.astimezone(timezone)
+            event.date = event.start.strftime('%Y-%m-%d')
+            event.start_string = get_time_with_leading_zeros(event.start)
+            event.end_string = get_time_with_leading_zeros(event.end)
+        except AttributeError:
+            pass
+
+    return render(request, 'my_calendar/event.html', view_data)
+
+@otp_required
+def event_delete(request, event_id):
+    '''
+    Delete given event
+    '''
+    event = Event.objects.get(pk=event_id) #pylint:disable=no-member
+    if not event:
+        raise Http404(f'Unable to locate event id: {event_id}')
+    event.delete()
+    return HttpResponseRedirect('/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/')
 
 #
 # Calendar Display
@@ -431,7 +501,7 @@ class Day():
             if timezone:
                 item.start = item.start.astimezone(timezone)
                 item.end = item.end.astimezone(timezone)
-            item = get_time_view(item)
+            item.time_string = get_time_view(item)
             self.events.append(item)
 
 @otp_required
