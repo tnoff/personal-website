@@ -9,7 +9,23 @@
         color: red
     }
 </style>
-<h2 align="center">Event</h2>
+<div align="center" class="row">
+    <div class="col"></div>
+    <div class="col">
+        {% if operation == 'create' %}
+        <h2>Event Create</h2>
+        {% else %}
+        <h2>Event Update</h2>
+        {% endif %}
+    </div>
+    <div align="right" class="col">
+        <form action="/6a8a3ce2-a91f-4605-8010-145c113d467f/{{event.id}}/delete" method="post">
+            {% csrf_token %}
+            <button name="delete" value="{{event.id}}" type="submit" class="btn btn-danger">Delete</button>
+        </form>
+    </div>
+</div>
+
 
 <p>{{errors}}</p>
 
@@ -53,11 +69,13 @@
             {% endif %}
         </div>
     </div>
-    {% if operation == 'create' %}
-    <textarea id="description" name="description" rows="10" cols="80">Event Description</textarea>
-    {% else %}
-    <textarea id="description" name="description" rows="10" cols="80">{{event.description}}</textarea>
-    {% endif %}
+    <div align="center">
+        {% if operation == 'create' %}
+        <textarea id="description" name="description" rows="10" cols="80" placeholder="Event Description"></textarea>
+        {% else %}
+        <textarea id="description" name="description" rows="10" cols="80">{{event.description}}</textarea>
+        {% endif %}
+    </div>
     <div align="center">
         <button type="submit" class="btn btn-primary">
             {% if operation == 'create' %}
@@ -68,10 +86,4 @@
         </button>
     </div>
 </form>
-<div align="center">
-    <form action="/6a8a3ce2-a91f-4605-8010-145c113d467f/{{event.id}}/delete" method="post">
-        {% csrf_token %}
-        <button name="delete" value="{{event.id}}" type="submit" class="btn btn-danger">Delete</button>
-    </form>
-</div>
 {% endblock %}
