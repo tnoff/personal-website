@@ -12,7 +12,10 @@ def get_time_view(item):
         return f'{int(duration.seconds / (60))} minutes'
     hours = int(duration.seconds / ( 60 * 60))
     minutes = int(duration.seconds % (60 * 60))
-    return f'{hours} hours and {minutes} minutes'
+    stringy = f'{hours} hours'
+    if minutes > 0:
+        stringy = f'{stringy} and {minutes} minutes'
+    return stringy
 
 def get_time_with_leading_zeros(datetime_obj):
     '''

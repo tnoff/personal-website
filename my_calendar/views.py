@@ -420,6 +420,7 @@ def _generate_event(request, event, operation):
         timezone = pytz.timezone(request.user.websiteusersettings.timezone.zone)
         now = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
     except AttributeError:
+        timezone = pytz.utc
         now = date.today()
 
     view_data = {
