@@ -126,51 +126,6 @@ def task_update(request, task_id):
         return render(request, 'my_calendar/task.html', view_data)
     return render(request, 'my_calendar/task.html', view_data)
 
-# TODO just combine this with the update
-@otp_required
-def task_show(request, task_id):
-    '''
-    Show individual task
-    '''
-    task = Task.objects.get(id=task_id) #pylint:disable=no-member
-    if not task:
-        raise Http404(f'Unable to locate task id: {task_id}')
-
-    task.day_of_week = DAYS_OF_WEEK[task.day_of_week][1]
-
-    month_message = f'Repeats every {task.month_offset}th month '
-    if task.month_offset == 1:
-        month_message = 'Repeats every month '
-    elif task.month_offset == 2:
-        month_message = 'Repeats every 2nd month '
-    elif task.month_offset == 3:
-        month_message = 'Repeats every 3rd month '
-
-    week_message = f' on the {task.week_offset}th {task.day_of_week} of that month'
-    if task.week_offset == 1:
-        week_message = f' on the 1st {task.day_of_week} of that month'
-    elif task.week_offset == 2:
-        week_message = f' on the 2nd {task.day_of_week} of that month'
-    elif task.week_offset == 3:
-        week_message = f' on the 3rd {task.day_of_week} of that month'
-
-    repeat_message = f'{month_message}{week_message}'
-    if task.month_offset == 0:
-        if task.week_offset == 1:
-            repeat_message = f'Repeats every week on {task.day_of_week}'
-        elif task.week_offset == 2:
-            repeat_message = f'Repeats every other week on {task.day_of_week}'
-        elif task.week_offset == 3:
-            repeat_message = f'Repeats every 3rd week on {task.day_of_week}'
-        else:
-            repeat_message = f'Repeats every {task.week_offset}th week on {task.day_of_week}'
-
-    view_data = {
-        'task': task,
-        'repeat_message': repeat_message,
-    }
-    return render(request, 'my_calendar/task_show.html', view_data)
-
 @otp_required
 def task_mark_done(request, task_id):
     '''
@@ -337,6 +292,8 @@ def people_list(request):
 #
 # Group Methods
 #
+
+# TODO add proper group edit/delete
 
 @otp_required
 def group_create(request):

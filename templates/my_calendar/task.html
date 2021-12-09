@@ -6,9 +6,30 @@
         color: red
     }
 </style>
-<h2 align="center">Task Create</h2>
+
+<div class="row" align="center">
+    <div class="col-10"></div>
+    <div align="right" class="col-1">
+        <form action="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/{{task.id}}/done" method="post">
+            {% csrf_token %}
+            <button name="mark_done" value="{{task.id}}" type="submit" class="btn btn-success">Mark Done</button>
+        </form>
+    </div>
+    <div align="left" class="col-1">
+        <form action="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/{{task.id}}/delete" method="get">
+            {% csrf_token %}
+            <button name="delete" value="{{task.id}}" type="submit" class="btn btn-danger">Delete</button>
+        </form>
+    </div>
+</div>
 
 <p>{{errors}}</p>
+
+{% if operation == 'create' %}
+<h2 align="center">Task Create</h2>
+{% else %}
+<h2 align="center">Task Update</h2>
+{% endif %}
 
 <div align="center">
     {% if operation == 'create' %}
