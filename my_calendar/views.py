@@ -164,22 +164,7 @@ def person_create(request):
     '''
     Create new person
     '''
-    view_data = {
-        'operation': 'create',
-        'possible_groups': [(group.id, group.name) for group in Group.objects.all()], #pylint:disable=no-member
-    }
-    if request.method == 'POST':
-        # TODO find out why form isnt getting all groups here properly
-        groups = [int(group) for group in request.POST.getlist('groups')] or []
-        form = PersonForm(request.POST)
-        if form.is_valid():
-            person = form.save()
-            person.groups.set(groups)
-            person.save()
-            return HttpResponseRedirect('/e37047af-f536-423e-8a72-731cbced13ea/')
-        view_data['errors'] = form.errors
-        return render(request, 'my_calendar/person.html', view_data)
-    return render(request, 'my_calendar/person.html', view_data)
+    return _generate_person(request, None, 'create')
 
 @otp_required
 def person_update(request, person_id):
@@ -189,26 +174,28 @@ def person_update(request, person_id):
     person = Person.objects.get(id=person_id) #pylint:disable=no-member
     if not person:
         raise Http404(f'Unable to locate person id: {person_id}')
+    return _generate_person(request, person, 'update')
 
-    # Set non values to blank strings for form
-    if not person.phone_number:
-        person.phone_number = ''
-    if not person.birthday:
-        person.birthday = ''
+def _generate_person(request, person, operation):
+    if person:
+        # Set non values to blank strings for form
+        if not person.phone_number:
+            person.phone_number = ''
+        if not person.birthday:
+            person.birthday = ''
 
-    # Make sure birthday in proper form format
-    if person.birthday:
-        person.birthday = person.birthday.strftime('%Y-%m-%d')
-    # Get group ids for form
-    person.group_ids = [group.id for group in person.groups.all()]
+        # Make sure birthday in proper form format
+        if person.birthday:
+            person.birthday = person.birthday.strftime('%Y-%m-%d')
+        # Get group ids for form
+        person.group_ids = [group.id for group in person.groups.all()]
 
     view_data = {
-        'operation': 'update',
+        'operation': operation,
         'person': person,
         'possible_groups': [(group.id, group.name) for group in Group.objects.all()], #pylint:disable=no-member
     }
     if request.method == 'POST':
-        # TODO find out why form isnt getting all groups here properly
         groups = [int(group) for group in request.POST.getlist('groups')] or []
         form = PersonForm(request.POST, instance=person)
         if form.is_valid():
@@ -305,7 +292,6 @@ def group_create(request):
         'possible_people': [(person.id, person.name) for person in Person.objects.all()], #pylint:disable=no-member
     }
     if request.method == 'POST':
-        # TODO find out why form isnt getting all persons here properly
         people = [int(person) for person in request.POST.getlist('people')] or []
         form = GroupForm(request.POST)
         if form.is_valid():
