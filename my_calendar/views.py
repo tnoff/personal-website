@@ -218,19 +218,9 @@ def person_create(request):
         groups = [int(group) for group in request.POST.getlist('groups')] or []
         form = PersonForm(request.POST)
         if form.is_valid():
-            person_data = {}
-            for key, value in form.data.items():
-                if key == 'csrfmiddlewaretoken':
-                    continue
-                if key == 'groups':
-                    continue
-                if value == '':
-                    continue
-                person_data[key] = value
-            new_person = Person(**person_data)
-            new_person.save()
-            new_person.groups.set(groups)
-            new_person.save()
+            person = form.save()
+            person.groups.set(groups)
+            person.save()
             return HttpResponseRedirect('/e37047af-f536-423e-8a72-731cbced13ea/')
         view_data['errors'] = form.errors
         return render(request, 'my_calendar/person.html', view_data)
@@ -267,15 +257,7 @@ def person_update(request, person_id):
         groups = [int(group) for group in request.POST.getlist('groups')] or []
         form = PersonForm(request.POST, instance=person)
         if form.is_valid():
-            for key, value in form.data.items():
-                if key == 'csrfmiddlewaretoken':
-                    continue
-                if key == 'groups':
-                    continue
-                if value == '':
-                    continue
-                setattr(person, key, value)
-            person.save()
+            person = form.save()
             person.groups.set(groups)
             person.save()
             return HttpResponseRedirect('/e37047af-f536-423e-8a72-731cbced13ea/')
@@ -370,21 +352,13 @@ def group_create(request):
         people = [int(person) for person in request.POST.getlist('people')] or []
         form = GroupForm(request.POST)
         if form.is_valid():
-            group_data = {}
-            for key, value in form.data.items():
-                if key == 'csrfmiddlewaretoken':
-                    continue
-                if key == 'people':
-                    continue
-                group_data[key] = value
-            new_group = Group(**group_data)
-            new_group.save()
+            group = form.save()
             for person in people:
                 person = Person.objects.get(id=person) #pylint:disable=no-member
-                person.groups.add(new_group)
+                person.groups.add(group)
                 person.save()
             return HttpResponseRedirect('/e37047af-f536-423e-8a72-731cbced13ea/'\
-                                        f'?groups={new_group.name}')
+                                        f'?groups={group.name}')
         view_data['errors'] = form.errors
         return render(request, 'my_calendar/group.html', view_data)
     return render(request, 'my_calendar/group.html', view_data)
@@ -430,33 +404,27 @@ def _generate_event(request, event, operation):
     }
 
     if request.method == 'POST':
+        # We do not have the proper datetime objects from the form
+        # So here we need to generate the datetime objects from the date, and then time
         form_data = dict(request.POST)
         form_data['title'] = form_data.pop('title')[0]
         form_data['description'] = form_data.pop('description')[0]
         event_date = datetime.strptime(form_data.pop('event_date')[0], '%Y-%m-%d')
         event_start_time = datetime.strptime(form_data.pop('start_time')[0], '%H:%M')
         event_end_time = datetime.strptime(form_data.pop('end_time')[0], '%H:%M')
+
         local_start = datetime(event_date.year, event_date.month, event_date.day,
                                event_start_time.hour, event_start_time.minute)
         local_end = datetime(event_date.year, event_date.month, event_date.day,
                              event_end_time.hour, event_end_time.minute)
+
         form_data['start'] = timezone.localize(local_start, is_dst=None).astimezone(pytz.utc)
         form_data['end'] = timezone.localize(local_end, is_dst=None).astimezone(pytz.utc)
+
         form = EventForm(form_data, instance=event)
         if form.is_valid():
-            if event is not None:
-                event.save()
-                return HttpResponseRedirect('/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/')
-            event_data = {}
-            for key, value in form.data.items():
-                if key == 'csrfmiddlewaretoken':
-                    continue
-                if value == '':
-                    continue
-                event_data[key] = value
-            new_event = Event(**event_data)
-            new_event.save()
-            return HttpResponseRedirect(f'/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/{new_event.start.year}/{new_event.start.month}')
+            form.save()
+            return HttpResponseRedirect(f'/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/{form.data["start"].year}/{form.data["start"].month}')
         view_data['errors'] = form.errors
 
     if operation == 'update':
