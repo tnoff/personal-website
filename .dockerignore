@@ -1,7 +1,0 @@
-website/website/local_settings.py
-website.log*
-website/my.cnf
-website/secret_key
-website/website.log*
-website/*.sqlite3
-website/geckodriver.log
