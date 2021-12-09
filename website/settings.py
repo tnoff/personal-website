@@ -72,7 +72,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
-            'read_default_file': os.path.join(BASE_DIR, 'my.cnf'),
+            'read_default_file': os.path.join(BASE_DIR, '.my.cnf'),
         },
     }
 }
@@ -96,7 +96,7 @@ LOGGING = {
         },
         'rotated_logs': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/logs/website/website.log',
+            'filename': '/var/log/website/website.log',
             'maxBytes': 1024 * 1024 * 5,  # 5 MB
             'backupCount': 5,
             'formatter': 'default',
