@@ -501,6 +501,10 @@ class Day():
             if timezone:
                 item.start = item.start.astimezone(timezone)
                 item.end = item.end.astimezone(timezone)
+            # Sometimes we can get a day that spans multiple days in UTC
+            # check here for those edge cases
+            if item.start.day != datetime_date.day:
+                continue
             item.time_string = get_time_view(item)
             self.events.append(item)
 
