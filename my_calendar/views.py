@@ -409,6 +409,7 @@ class Day():
         self.events = []
         day_events = Event.objects.filter(start__range=[datetime_date, #pylint:disable=no-member
                                                         datetime_date + timedelta(days=1)])
+        # TODO make sure these get sorted by start time
         for item in day_events:
             if timezone:
                 item.start = item.start.astimezone(timezone)
