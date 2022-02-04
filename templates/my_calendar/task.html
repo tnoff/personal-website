@@ -35,7 +35,7 @@
     {% if operation == 'create' %}
     <form action="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/create/" method="post">
     {% else %}
-    <form action="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/{{task.id}}/edit" method="post">
+    <form action="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/{{task.id}}" method="post">
     {% endif %}
         {% csrf_token %}
         <div class="form-group">
