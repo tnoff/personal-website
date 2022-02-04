@@ -408,8 +408,7 @@ class Day():
         self.tasks = Task.objects.filter(due_date=datetime_date) #pylint:disable=no-member
         self.events = []
         day_events = Event.objects.filter(start__range=[datetime_date, #pylint:disable=no-member
-                                                        datetime_date + timedelta(days=1)])
-        # TODO make sure these get sorted by start time
+                                                        datetime_date + timedelta(days=1)]).order_by('start')
         for item in day_events:
             if timezone:
                 item.start = item.start.astimezone(timezone)
@@ -418,7 +417,7 @@ class Day():
             # check here for those edge cases
             if item.start.day != datetime_date.day:
                 continue
-            item.time_string = get_time_view(item)
+            item.time_string = f'{item.start.strftime("%H:%M")}-{item.end.strftime("%H:%M")}'
             self.events.append(item)
 
 @otp_required
