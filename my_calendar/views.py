@@ -413,10 +413,6 @@ class Day():
             if timezone:
                 item.start = item.start.astimezone(timezone)
                 item.end = item.end.astimezone(timezone)
-            # Sometimes we can get a day that spans multiple days in UTC
-            # check here for those edge cases
-            if item.start.day != datetime_date.day:
-                continue
             item.time_string = f'{item.start.strftime("%H:%M")}-{item.end.strftime("%H:%M")}'
             self.events.append(item)
 
