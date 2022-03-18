@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 from timezone_field import TimeZoneField
 
@@ -11,7 +11,7 @@ class UserSettings(models.Model):
     Set timezone for user
     '''
     class Meta:
-        verbose_name_plural = ugettext_lazy("UserSettings")
+        verbose_name_plural = gettext_lazy("UserSettings")
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     timezone = TimeZoneField(default='America/Los_Angeles')
