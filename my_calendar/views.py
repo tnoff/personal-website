@@ -407,12 +407,16 @@ class Day():
         self.birthdays = [item.name for item in Person.objects.filter(birthday=datetime_date)] #pylint:disable=no-member
         self.tasks = Task.objects.filter(due_date=datetime_date) #pylint:disable=no-member
         self.events = []
-        day_events = Event.objects.filter(start__range=[datetime_date, #pylint:disable=no-member
-                                                        datetime_date + timedelta(days=1)]).order_by('start')
+        # Grab next day in case timezones go over
+        day_events = Event.objects.filter(start__range=[datetime_date - timedelta(days=2), #pylint:disable=no-member
+                                                        datetime_date + timedelta(days=2)]).order_by('start')
         for item in day_events:
             if timezone:
                 item.start = item.start.astimezone(timezone)
                 item.end = item.end.astimezone(timezone)
+            # Check if day matches, for timezones
+            if item.start.day != datetime_date.day:
+                continue
             item.time_string = f'{item.start.strftime("%H:%M")}-{item.end.strftime("%H:%M")}'
             self.events.append(item)
 
