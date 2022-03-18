@@ -1,16 +1,21 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy
 
 from timezone_field import TimeZoneField
 
 # https://stackoverflow.com/questions/2886987/adding-custom-fields-to-users-in-django
 # https://docs.djangoproject.com/en/dev/topics/auth/customizing/#extending-django-s-default-user
-class WebsiteUserSettings(models.Model):
+class UserSettings(models.Model):
     '''
     Set timezone for user
     '''
+    class Meta:
+        verbose_name_plural = ugettext_lazy("UserSettings")
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     timezone = TimeZoneField(default='America/Los_Angeles')
+    week_start_day = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username #pylint:disable=no-member

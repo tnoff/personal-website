@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from my_calendar.forms import EventForm, PersonForm, TaskForm
-from my_calendar.models import Event, Group, Person, Task, WebsiteUserSettings
+from my_calendar.models import Event, Group, Person, Task, UserSettings
 
 class EventAdmin(admin.ModelAdmin):
     '''
@@ -26,7 +26,7 @@ class GroupAdmin(admin.ModelAdmin):
     Admin for Group Model
     '''
 
-class WebsiteUserSettingsAdmin(admin.ModelAdmin):
+class UserSettingsAdmin(admin.ModelAdmin):
     '''
     Admin for Website Settings Model
     '''
@@ -35,4 +35,4 @@ admin.site.register(Event, EventAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Task, TaskAdmin)
 admin.site.register(Group, GroupAdmin)
-admin.site.register(WebsiteUserSettings, WebsiteUserSettingsAdmin)
+admin.site.register(UserSettings, UserSettingsAdmin)

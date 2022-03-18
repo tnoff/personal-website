@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import date, datetime, timedelta
 
 import pytz
@@ -37,7 +38,7 @@ def task_list(request):
     Show tasks as a sorted list
     '''
     try:
-        now = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
+        now = get_today_with_timezone(request.user.usersettings.timezone.zone)
     except AttributeError:
         now = date.today()
     tasks = Task.objects.all() #pylint:disable=no-member
@@ -57,7 +58,7 @@ def task_create(request):
     Create new task
     '''
     try:
-        now = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
+        now = get_today_with_timezone(request.user.usersettings.timezone.zone)
     except AttributeError:
         now = date.today()
     view_data = {
@@ -132,7 +133,7 @@ def task_mark_done(request, task_id):
     API call to mark task as done
     '''
     try:
-        now = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
+        now = get_today_with_timezone(request.user.usersettings.timezone.zone)
     except AttributeError:
         now = date.today()
     task = Task.objects.get(id=task_id) #pylint:disable=no-member
@@ -232,7 +233,7 @@ def people_list(request):
         groups = groups.split(',')
 
     try:
-        today = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
+        today = get_today_with_timezone(request.user.usersettings.timezone.zone)
     except AttributeError:
         today = date.today()
     _update_past_birthdays(today=today)
@@ -334,8 +335,8 @@ def _generate_event(request, event, operation):
         'operation': 'update',
     }
     try:
-        timezone = pytz.timezone(request.user.websiteusersettings.timezone.zone)
-        now = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
+        timezone = pytz.timezone(request.user.usersettings.timezone.zone)
+        now = get_today_with_timezone(request.user.usersettings.timezone.zone)
     except AttributeError:
         timezone = pytz.utc
         now = date.today()
@@ -427,8 +428,8 @@ def calendar(request, year=None, month=None): #pylint:disable=too-many-locals
     '''
     # Get date from defaults
     try:
-        timezone = pytz.timezone(request.user.websiteusersettings.timezone.zone)
-        today = get_today_with_timezone(request.user.websiteusersettings.timezone.zone)
+        timezone = pytz.timezone(request.user.usersettings.timezone.zone)
+        today = get_today_with_timezone(request.user.usersettings.timezone.zone)
     except AttributeError:
         timezone = None
         today = date.today()
@@ -455,13 +456,25 @@ def calendar(request, year=None, month=None): #pylint:disable=too-many-locals
         prev_year -= 1
         prev_month = 12
 
+    # Rotate to start of week for user
+    days_of_week_names = [day[1] for day in DAYS_OF_WEEK]
+    for _ in range(request.user.usersettings.week_start_day):
+        days_of_week_names.append(days_of_week_names.pop(0))
+    
+    # End of week day, for rotating later
+    end_of_week_day = request.user.usersettings.week_start_day - 1
+    if end_of_week_day < 0:
+        end_of_week_day = 6
+
+
     # List of weeks for table rows
     week_table_rows = []
     week_row = []
 
     datetime_day = date(year, month, 1)
     # Start with beginning of week, even if previous month
-    datetime_day = datetime_day - timedelta(datetime_day.weekday())
+    while datetime_day.weekday() != request.user.usersettings.week_start_day:
+        datetime_day = datetime_day - timedelta(1)
 
     # End of month
     try:
@@ -474,13 +487,13 @@ def calendar(request, year=None, month=None): #pylint:disable=too-many-locals
     while datetime_day <= end_day:
         day_object = Day(datetime_day, today, timezone=timezone)
         week_row.append(day_object)
-        if datetime_day.weekday() == 6:
+        if datetime_day.weekday() == end_of_week_day:
             week_table_rows.append(week_row)
             week_row = []
         datetime_day += timedelta(1)
     # Add remaining days in week, even if next month
     if week_row:
-        for _ in range(7 - datetime_day.weekday()):
+        while day_object.datetime_date.weekday() != end_of_week_day:
             day_object = Day(datetime_day, today, timezone=timezone)
             week_row.append(day_object)
             datetime_day += timedelta(1)
@@ -491,7 +504,7 @@ def calendar(request, year=None, month=None): #pylint:disable=too-many-locals
         'calendar_name' : f'{MONTHS[month - 1][1]} {year}',
         'next_month' : f'{next_year}/{next_month}',
         'prev_month' : f'{prev_year}/{prev_month}',
-        'days_of_week_names' : [day[1] for day in DAYS_OF_WEEK],
+        'days_of_week_names' : days_of_week_names,
         'week_table_rows' : week_table_rows,
     }
     return render(request, 'my_calendar/calendar.html', view_data)
