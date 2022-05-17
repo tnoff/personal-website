@@ -22,12 +22,12 @@
 <h1 align="center">Backup Tool</h1>
 <hr>
 <p>Backup Tool is a python package and command line tool that can be used to encyrpt and backup local files to <a href="https://docs.cloud.oracle.com/en-us/iaas/Content/Object/Concepts/objectstorageoverview.htm">Oracle Cloud Infrastructures Object Storage</a>. Once backed up to OCI Object Storage, files can also be downloaded and decrypted to restore local copies of files.</p>
-<p>Backup Tool uses a basic AES encryption method with a password of 16 ( or a multiple of 16 ) characters in length. Files are encrypted before they are uploaded to OCI Object Storage to be backed up, and local md5 sums of the original file and the encrypted file are stored in a local SQLITE database.</p>
+<p>Backup Tool uses a basic AES encryption method with a password of 16, 24, or 32 characters in length. Files are encrypted before they are uploaded to OCI Object Storage to be backed up, and local md5 sums of the original file and the encrypted file are stored in a local SQLITE database.</p>
 <p>Encrypted files can then be downloaded, and decrypted using the same password. Backup tool will verify the downloaded file and the decrypted files md5 sum against what was saved in the database.</p>
 <p>You can view and download the source code on <a href="https://github.com/tnoff/backup-tool">github</a>.</p>
 
 <h1 align="center">Discord Bot</h1>
 <hr>
-<p>A discord bot written in python for twitter, <a href="https://en.wikipedia.org/wiki/Markov_chain">Markov Chain</a> "AI" speech bot, and other useful functions, including plugin support. Bot can be installed via a python package or via a pre-built docker container.</p>
-<p>You can view and download the source code on <a href="https://github.com/tnoff/discord-bot">github</a>.</p>
+<p>A discord bot framework written in python. Includes database support, retry logic, and plugin support. You can view and download the source code on <a href="https://github.com/tnoff/discord-bot">github</a>.</p>
+<p>There are some example plugins I've written available in <a href="https://github.com/tnoff/discord-bot-plugins">github</a>. These plugins include support for twitter functions, playing music in voice chat, role assignment, and markov chains that mimic user chat.</p>
 {% endblock %}
