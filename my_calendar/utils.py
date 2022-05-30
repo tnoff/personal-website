@@ -2,22 +2,6 @@ from datetime import date, datetime, timedelta
 
 import pytz
 
-def get_time_view(item):
-    '''
-    If event is less than an hour, show minutes
-    If longer, show length in hours and minutes
-    '''
-    # TODO minutes seems bugged, try doing 2 hour 30 min event
-    duration = item.end - item.start
-    if duration.seconds < 60 * 60:
-        return f'{int(duration.seconds / (60))} minutes'
-    hours = int(duration.seconds / ( 60 * 60))
-    minutes = int(duration.seconds % (60 * 60))
-    stringy = f'{hours} hours'
-    if minutes > 0:
-        stringy = f'{stringy} and {minutes} minutes'
-    return stringy
-
 def get_time_with_leading_zeros(datetime_obj):
     '''
     Get HH:MM with leading zeros

@@ -13,7 +13,7 @@ from my_calendar.constants import DAYS_OF_WEEK, MONTHS
 from my_calendar.forms import EventForm, GroupForm, PersonForm, TaskForm
 from my_calendar.models import Event, Group, Person, Task
 from my_calendar.utils import get_today_with_timezone
-from my_calendar.utils import get_time_view, find_next_due_date, get_time_with_leading_zeros
+from my_calendar.utils import find_next_due_date, get_time_with_leading_zeros
 
 
 #
