@@ -28,6 +28,14 @@
 
 <h1 align="center">Discord Bot</h1>
 <hr>
-<p>A discord bot framework written in python. Includes database support, retry logic, and plugin support. You can view and download the source code on <a href="https://github.com/tnoff/discord-bot">github</a>.</p>
-<p>There are some example plugins I've written available in <a href="https://github.com/tnoff/discord-bot-plugins">github</a>. These plugins include support for twitter functions, playing music in voice chat, role assignment, and markov chains that mimic user chat.</p>
+<p>A discord bot framework written in python. Requires a valid discord bot <a href="https://discord.com/developers/docs/topics/oauth2#bots">token</a>.</p>
+<p>Includes basic database support for sqlite and myself, metadata commands, and plugin support via importing a base "Cog" class. This base cog class also includes support for retries of your custom commands.</p>
+<p>You can view and download the source code on <a href="https://github.com/tnoff/discord-bot">github</a>.</p>
+<p>I keep some discord plugins I maintain in a separate repo, so they are not included by default. There are some example plugins I've written available in <a href="https://github.com/tnoff/discord-bot-plugins">github</a>. These plugins include support for:</p>
+<ul>
+    <li>Twitter: Show posts from a specific twitter account in a channel</li>
+    <li>Music: Play audio from youtube in Voice Chat</li>
+    <li>Role Assignment: Assign roles to users via a channel message</li>
+    <li>Markov Bot: Mimic user chat using Markov chains</li>
+</ul>
 {% endblock %}
