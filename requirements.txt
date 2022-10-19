@@ -5,3 +5,4 @@ django-timezone-field==5.0
 tzdata==2022.5
 django-phonenumber-field==6.4.0
 phonenumbers==8.12.57
+django-bootstrap-v5==1.0.11
