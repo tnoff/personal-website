@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'two_factor',
     # Bootstrap
     'bootstrap5',
+    'django_bootstrap_icons',
     # Custom apps
     'homepage',
     'my_calendar',

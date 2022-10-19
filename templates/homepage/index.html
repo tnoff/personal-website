@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load bootstrap_icons %}
 {% block content %}
 <style type="text/css">
     #sub-pages{
@@ -24,6 +25,11 @@
                 <h3><a href="/projects">Projects</a></h3>
                 <p>Side projects I've published</p>
             </div>
+        </div>
+        <div id="sub-pages" class="row">
+            <a href="https://linkedin.com/in/tyler-n-89634344">{% bs_icon 'linkedin' size='2.5em' %}</i> Linkedin</a>
+            <a href="mailto: ty_north@yahoo.com">{% bs_icon 'mailbox'  size='2.5em' %}</i>Email: ty_north@yahoo.com</a>
+            <a href="mailto: https://github.com/tnoff">{% bs_icon 'github'  size='2.5em' %}</i> Github Profile</a>
         </div>
     </div>
 </div>
