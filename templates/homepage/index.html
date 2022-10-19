@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
 <style type="text/css">
     #sub-pages{
@@ -10,7 +10,7 @@
 <hr>
 <div class="row">
     <div class="col" align="center">
-        <img src="/static/pictures/headshot.png" width="60%" height="70%">
+        <img src="{% static 'pictures/headshot.png' %}" width="60%" height="70%">
     </div>
     <div class="col-7" align="left">
         <p>Software Engineer in the San Francisco Bay Area, currently working at <a href="https://www.groove.co/">groove.co</a>.</p>

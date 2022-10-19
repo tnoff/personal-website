@@ -11,3 +11,4 @@ logs/
 website.log*
 *.sqlite3
 geckodriver.log
+static/admin/
