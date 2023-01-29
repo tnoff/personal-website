@@ -1,16 +1,30 @@
 import os
+from pathlib import Path
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+class SetupException(Exception):
+  '''
+  Errors in settings.py setup and such
+  '''
 
-SECRET_KEY_PATH = os.path.join(BASE_DIR, 'secret_key')
+BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-with open(SECRET_KEY_PATH, 'r') as secret_reader:
-    SECRET_KEY = secret_reader.read()
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', None)
+if SECRET_KEY is None:
+    SECRET_KEY_FILE = BASE_DIR / 'secret_key'
+    if not SECRET_KEY_FILE.exists():
+        raise SetupException('No secret key file')
+
+    SECRET_KEY = SECRET_KEY_FILE.read_text()
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['tyler-north.com']
+ALLOWED_HOSTS = []
 
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+else:
+    ALLOWED_HOSTS.append('localhost')
 
 # Application definition
 
@@ -74,14 +88,26 @@ WSGI_APPLICATION = 'website.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'read_default_file': os.path.join(BASE_DIR, '.my.cnf'),
-        },
+if 'POSTGRES_DATABASE' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ['POSTGRES_DATABASE'],
+            'USER': os.environ['POSTGRES_USER'],
+            'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+            'HOST': os.environ['POSTGRES_HOST'],
+            'PORT': '5432',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+LOG_FILE = BASE_DIR / 'website.log'
 
 # Logging
 # https://docs.djangoproject.com/en/3.0/topics/logging/
@@ -102,7 +128,7 @@ LOGGING = {
         },
         'rotated_logs': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/var/log/website/website.log',
+            'filename': LOG_FILE,
             'maxBytes': 1024 * 1024 * 5,  # 5 MB
             'backupCount': 5,
             'formatter': 'default',
@@ -155,14 +181,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = str(BASE_DIR / 'static')
 
 # Login settings
 LOGIN_URL = 'two_factor:login'
 LOGIN_REDIRECT_URL = 'two_factor:profile'
 TWO_FACTOR_QR_FACTORY = 'qrcode.image.pil.PilImage'
-
-try:
-    from website.local_settings import * #pylint:disable=wildcard-import,unused-wildcard-import
-except ImportError:
-    pass
