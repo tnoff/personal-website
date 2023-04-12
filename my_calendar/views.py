@@ -12,17 +12,20 @@ from django_otp.decorators import otp_required
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
 from my_calendar.forms import EventForm, GroupForm, PersonForm, TaskForm
 from my_calendar.models import Event, Group, Person, Task
-from my_calendar.utils import get_today_with_timezone
+from my_calendar.utils import get_datetime_with_timezone
 from my_calendar.utils import find_next_due_date, get_time_with_leading_zeros
 
 
 # Common method to run when calendar is loaded
-def __update_birthdays(time_delta=60):
-    today = date.today()
-    past_bdays = Person.objects.filter(birthday__lt=(today - timedelta(time_delta))) #pylint:disable=no-member
-    for person in past_bdays:
-        person.birthday = date(today.year + 1, person.birthday.month, person.birthday.day)
-        person.save()
+def __update_birthdays(user, time_delta=60):
+    if not user.usersettings.birthdays_last_updated or (user.usersettings.birthdays_last_updated - get_datetime_with_timezone(user.usersettings.timezone.zone)).days > time_delta:
+        today = date.today()
+        past_bdays = Person.objects.filter(birthday__lt=(today - timedelta(days=time_delta))) #pylint:disable=no-member
+        for person in past_bdays:
+            person.birthday = date(today.year + 1, person.birthday.month, person.birthday.day)
+            person.save()
+        user.usersettings.birthdays_last_updated = datetime.utcnow()
+        user.usersettings.save()
 
 #
 # Task Methods
@@ -35,7 +38,7 @@ def task_list(request):
     Show tasks as a sorted list
     '''
     try:
-        now = get_today_with_timezone(request.user.usersettings.timezone.zone)
+        now = get_datetime_with_timezone(request.user.usersettings.timezone.zone).date()
     except AttributeError:
         now = date.today()
     tasks = Task.objects.all() #pylint:disable=no-member
@@ -55,7 +58,7 @@ def task_create(request):
     Create new task
     '''
     try:
-        now = get_today_with_timezone(request.user.usersettings.timezone.zone)
+        now = get_datetime_with_timezone(request.user.usersettings.timezone.zone).date()
     except AttributeError:
         now = date.today()
     view_data = {
@@ -130,7 +133,7 @@ def task_mark_done(request, task_id):
     API call to mark task as done
     '''
     try:
-        now = get_today_with_timezone(request.user.usersettings.timezone.zone)
+        now = get_datetime_with_timezone(request.user.usersettings.timezone.zone).date()
     except AttributeError:
         now = date.today()
     task = Task.objects.get(id=task_id) #pylint:disable=no-member
@@ -230,7 +233,7 @@ def people_list(request):
         groups = groups.split(',')
 
     try:
-        today = get_today_with_timezone(request.user.usersettings.timezone.zone)
+        today = get_datetime_with_timezone(request.user.usersettings.timezone.zone).date()
     except AttributeError:
         today = date.today()
 
@@ -332,7 +335,7 @@ def _generate_event(request, event, operation):
     }
     try:
         timezone = pytz.timezone(request.user.usersettings.timezone.zone)
-        now = get_today_with_timezone(request.user.usersettings.timezone.zone)
+        now = get_datetime_with_timezone(request.user.usersettings.timezone.zone).today()
     except AttributeError:
         timezone = pytz.utc
         now = date.today()
@@ -423,11 +426,11 @@ def calendar(request, year=None, month=None): #pylint:disable=too-many-locals
     Calednar view with birthdays and tasks
     '''
     # Update birthdays if we havent in a while
-    __update_birthdays()
+    __update_birthdays(request.user)
     # Get date from defaults
     try:
         timezone = pytz.timezone(request.user.usersettings.timezone.zone)
-        today = get_today_with_timezone(request.user.usersettings.timezone.zone)
+        today = get_datetime_with_timezone(request.user.usersettings.timezone.zone).date()
     except AttributeError:
         timezone = None
         today = date.today()

@@ -1,6 +1,6 @@
 from datetime import date, datetime, timedelta
 
-import pytz
+from pytz import timezone
 
 def get_time_with_leading_zeros(datetime_obj):
     '''
@@ -52,8 +52,8 @@ def find_next_due_date(month_offset, week_offset, day_of_week, start, due_date=N
         time_delta = due_date - start
     return due_date
 
-def get_today_with_timezone(zone):
+def get_datetime_with_timezone(zone):
     '''
     Get current date within timezone
     '''
-    return datetime.now(pytz.timezone(zone)).date()
+    return datetime.now(timezone(zone))

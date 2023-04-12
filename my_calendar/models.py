@@ -16,6 +16,7 @@ class UserSettings(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     timezone = TimeZoneField(default='America/Los_Angeles')
     week_start_day = models.IntegerField(default=0)
+    birthdays_last_updated = models.DateTimeField()
 
     def __str__(self):
         return self.user.username #pylint:disable=no-member
