@@ -17,7 +17,7 @@ from my_calendar.utils import find_next_due_date, get_time_with_leading_zeros
 
 
 # Common method to run when calendar is loaded
-def __update_birthdays(time_delta=60)
+def __update_birthdays(time_delta=60):
     today = date.today()
     past_bdays = Person.objects.filter(birthday__lt=(today - timedelta(time_delta))) #pylint:disable=no-member
     for person in past_bdays:
