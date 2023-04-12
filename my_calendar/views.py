@@ -16,6 +16,14 @@ from my_calendar.utils import get_today_with_timezone
 from my_calendar.utils import find_next_due_date, get_time_with_leading_zeros
 
 
+# Common method to run when calendar is loaded
+def __update_birthdays(time_delta=60)
+    today = date.today()
+    past_bdays = Person.objects.filter(birthday__lt=(today - timedelta(time_delta))) #pylint:disable=no-member
+    for person in past_bdays:
+        person.birthday = date(today.year + 1, person.birthday.month, person.birthday.day)
+        person.save()
+
 #
 # Task Methods
 #
@@ -414,6 +422,8 @@ def calendar(request, year=None, month=None): #pylint:disable=too-many-locals
     '''
     Calednar view with birthdays and tasks
     '''
+    # Update birthdays if we havent in a while
+    __update_birthdays()
     # Get date from defaults
     try:
         timezone = pytz.timezone(request.user.usersettings.timezone.zone)
