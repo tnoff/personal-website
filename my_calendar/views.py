@@ -28,11 +28,11 @@ def conditional_decorator(dec, condition):
 
 # Common method to run when calendar is loaded
 def __update_birthdays(user, time_delta=60):
-    if not user.usersettings.birthdays_last_updated or (user.usersettings.birthdays_last_updated - get_datetime_with_timezone(user.usersettings.timezone.zone)).days > time_delta:
+    if not user.usersettings.birthdays_last_updated or (get_datetime_with_timezone(user.usersettings.timezone.zone) - user.usersettings.birthdays_last_updated).days > time_delta:
         today = date.today()
         past_bdays = Person.objects.filter(birthday__lt=(today - timedelta(days=time_delta))) #pylint:disable=no-member
         for person in past_bdays:
-            person.birthday = date(today.year + 1, person.birthday.month, person.birthday.day)
+            person.birthday = date(person.birthday.year + 1, person.birthday.month, person.birthday.day)
             person.save()
         user.usersettings.birthdays_last_updated = datetime.utcnow()
         user.usersettings.save()
