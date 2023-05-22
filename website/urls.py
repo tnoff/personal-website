@@ -6,8 +6,10 @@ from two_factor.admin import AdminSiteOTPRequired
 
 from homepage.urls import homepage_urls
 from my_calendar.urls import my_calendar_urls
+from website.settings import SECRET_KEY_FILE
 
-admin.site.__class__ = AdminSiteOTPRequired
+if not SECRET_KEY_FILE.exists():
+    admin.site.__class__ = AdminSiteOTPRequired
 
 urlpatterns = [
     path('', include(tf_urls)),

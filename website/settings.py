@@ -7,13 +7,12 @@ class SetupException(Exception):
   '''
 
 BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SECRET_KEY_FILE = BASE_DIR / 'secret_key'
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', None)
 if SECRET_KEY is None:
-    SECRET_KEY_FILE = BASE_DIR / 'secret_key'
     if not SECRET_KEY_FILE.exists():
         raise SetupException('No secret key file')
-
     SECRET_KEY = SECRET_KEY_FILE.read_text()
 
 DEBUG = False

@@ -14,6 +14,16 @@ from my_calendar.forms import EventForm, GroupForm, PersonForm, TaskForm
 from my_calendar.models import Event, Group, Person, Task
 from my_calendar.utils import get_datetime_with_timezone
 from my_calendar.utils import find_next_due_date, get_time_with_leading_zeros
+from website.settings import SECRET_KEY_FILE
+
+# https://stackoverflow.com/questions/10724854/how-to-do-a-conditional-decorator-in-python
+def conditional_decorator(dec, condition):
+    def decorator(func):
+        if not condition:
+            # Return the function unchanged, not decorated.
+            return func
+        return dec(func)
+    return decorator
 
 
 # Common method to run when calendar is loaded
@@ -32,7 +42,7 @@ def __update_birthdays(user, time_delta=60):
 #
 
 
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def task_list(request):
     '''
     Show tasks as a sorted list
@@ -52,7 +62,7 @@ def task_list(request):
     }
     return render(request, 'my_calendar/task_list.html', view_data)
 
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def task_create(request):
     '''
     Create new task
@@ -83,7 +93,7 @@ def task_create(request):
         return render(request, 'my_calendar/task.html', view_data)
     return render(request, 'my_calendar/task.html', view_data)
 
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def task_delete(_request, task_id):
     '''
     Delete individual task
@@ -95,8 +105,7 @@ def task_delete(_request, task_id):
     task.delete()
     return HttpResponseRedirect('/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/')
 
-
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def task_update(request, task_id):
     '''
     Update individual task
@@ -127,7 +136,7 @@ def task_update(request, task_id):
         return render(request, 'my_calendar/task.html', view_data)
     return render(request, 'my_calendar/task.html', view_data)
 
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def task_mark_done(request, task_id):
     '''
     API call to mark task as done
@@ -160,14 +169,14 @@ def task_mark_done(request, task_id):
 # Person Methods
 #
 
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def person_create(request):
     '''
     Create new person
     '''
     return _generate_person(request, None, 'create')
 
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def person_update(request, person_id):
     '''
     Update existing person
@@ -208,7 +217,7 @@ def _generate_person(request, person, operation):
         return render(request, 'my_calendar/person.html', view_data)
     return render(request, 'my_calendar/person.html', view_data)
 
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def person_delete(_request, person_id):
     '''
     Delete individual person
@@ -220,7 +229,7 @@ def person_delete(_request, person_id):
     person.delete()
     return HttpResponseRedirect('/e37047af-f536-423e-8a72-731cbced13ea/')
 
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def people_list(request):
     '''
     Show all persons with phone numbers and birthdays
@@ -282,7 +291,7 @@ def people_list(request):
 
 # TODO add proper group edit/delete
 
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def group_create(request):
     '''
     Create new Group
@@ -311,7 +320,7 @@ def group_create(request):
 # Event Method
 #
 
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def event_update(request, event_id):
     '''
     Show full info for given event
@@ -321,7 +330,7 @@ def event_update(request, event_id):
         raise Http404(f'Unable to locate event id: {event_id}')
     return _generate_event(request, event, 'update')
 
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def event_create(request):
     '''
     Create new event
@@ -382,7 +391,7 @@ def _generate_event(request, event, operation):
 
     return render(request, 'my_calendar/event.html', view_data)
 
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def event_delete(request, event_id):
     '''
     Delete given event
@@ -420,7 +429,7 @@ class Day():
             item.time_string = f'{item.start.strftime("%H:%M")}-{item.end.strftime("%H:%M")}'
             self.events.append(item)
 
-@otp_required
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def calendar(request, year=None, month=None): #pylint:disable=too-many-locals
     '''
     Calednar view with birthdays and tasks
