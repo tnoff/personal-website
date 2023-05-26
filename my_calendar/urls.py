@@ -6,10 +6,13 @@ my_calendar_urls = [
     # Person urls
     re_path(r'e37047af-f536-423e-8a72-731cbced13ea/?$', views.people_list),
     re_path(r'e37047af-f536-423e-8a72-731cbced13ea/create/?$', views.person_create),
+    re_path(r'e37047af-f536-423e-8a72-731cbced13ea/bulk_update/?$', views.person_bulk_update),
     re_path(r'e37047af-f536-423e-8a72-731cbced13ea/(?P<person_id>\d+)/?$', views.person_update),
     re_path(r'e37047af-f536-423e-8a72-731cbced13ea/(?P<person_id>\d+)/delete/?$', views.person_delete),
     # Group urls
     re_path(r'c7063309-ff0a-4e95-8157-2d07bf6d3ea3/create/$', views.group_create),
+    # VCF urls
+    re_path(r'c57301de-fb29-4179-8b4f-cafaf5617322/import/?', views.vcf_create_imports),
     # Task urls
     re_path(r'0d27c6b9-a5d7-4782-9438-93b54b8f98f8/?$', views.task_list),
     re_path(r'0d27c6b9-a5d7-4782-9438-93b54b8f98f8/create/?$', views.task_create),

@@ -5,10 +5,7 @@ from django import forms
 
 from my_calendar.constants import DAYS_OF_WEEK
 from my_calendar.models import Event, Group, Person, Task
-
-# https://stackoverflow.com/questions/16699007/regular-expression-to-match-standard-10-digit-phone-number
-PHONE_NUMBER_REGEX = r'^(\+?\d{1,2})?(\s)?\(?\d{3}\)?([\s.-])?\d{3}([\s.-])?\d{4}'
-
+from my_calendar.utils import validate_phone_number, PhoneNumberException, PHONE_NUMBER_REGEX
 
 class PersonForm(forms.ModelForm):
     '''
@@ -25,18 +22,10 @@ class PersonForm(forms.ModelForm):
         '''
         Make sure phone number matches docstring
         '''
-        if self.cleaned_data['phone_number'] is None:
-            return None
-        matcher = re.match(PHONE_NUMBER_REGEX, self.cleaned_data['phone_number'])
-        if not matcher:
-            raise forms.ValidationError('Invalid number, '\
-                                        f'does not match regex {PHONE_NUMBER_REGEX}')
-        just_digits = ''.join(digit for digit in self.cleaned_data['phone_number'] \
-                                if digit in string.digits)
-        # If only 10 digits given, assume its a use code
-        if len(just_digits) == 10:
-            return f'+1{just_digits}'
-        return f'+{just_digits}'
+        try:
+            return validate_phone_number(self.cleaned_data['phone_number'])
+        except PhoneNumberException:
+            raise forms.ValidationError('Invalid number, does not match regex {PHONE_NUMBER_REGEX}')
 
 class GroupForm(forms.ModelForm):
     '''

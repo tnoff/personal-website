@@ -1,6 +1,29 @@
 from datetime import date, datetime, timedelta
+import re
+import string
 
 from pytz import timezone
+
+PHONE_NUMBER_REGEX = r'^(\+?\d{1,2})?([\s\-])?\(?\d{3}\)?([\s.-])?\d{3}([\s.-])?\d{4}'
+
+class PhoneNumberException(Exception):
+    pass
+
+def validate_phone_number(phone_number):
+    '''
+    Make sure phone number matches docstring
+    '''
+    if phone_number is None:
+        return None
+    matcher = re.match(PHONE_NUMBER_REGEX, phone_number)
+    if not matcher:
+        raise PhoneNumberException('Invalid number, '\
+                                   f'does not match regex {PHONE_NUMBER_REGEX}')
+    just_digits = ''.join(digit for digit in phone_number if digit in string.digits)
+    # If only 10 digits given, assume its a use code
+    if len(just_digits) == 10:
+        return f'+1{just_digits}'
+    return f'+{just_digits}'
 
 def get_time_with_leading_zeros(datetime_obj):
     '''

@@ -1,5 +1,7 @@
 from copy import deepcopy
 from datetime import date, datetime, timedelta
+import re
+import string
 
 import pytz
 
@@ -10,10 +12,10 @@ from django.shortcuts import redirect, render
 from django_otp.decorators import otp_required
 
 from my_calendar.constants import DAYS_OF_WEEK, MONTHS
-from my_calendar.forms import EventForm, GroupForm, PersonForm, TaskForm
+from my_calendar.forms import PHONE_NUMBER_REGEX, EventForm, GroupForm, PersonForm, TaskForm
 from my_calendar.models import Event, Group, Person, Task
 from my_calendar.utils import get_datetime_with_timezone
-from my_calendar.utils import find_next_due_date, get_time_with_leading_zeros
+from my_calendar.utils import find_next_due_date, get_time_with_leading_zeros, validate_phone_number
 from website.settings import SECRET_KEY_FILE
 
 # https://stackoverflow.com/questions/10724854/how-to-do-a-conditional-decorator-in-python
@@ -230,6 +232,44 @@ def person_delete(_request, person_id):
     return HttpResponseRedirect('/e37047af-f536-423e-8a72-731cbced13ea/')
 
 @conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
+def person_bulk_update(request):
+    '''
+    Bulk update within one call
+    '''
+    if request.method == 'POST':
+        new_persons = {}
+        for key, value in request.POST.items():
+            if key == 'csrfmiddlewaretoken':
+                continue
+            if key.startswith('update'):
+                person_id = int(key.replace('update-', ''))
+                person = Person.objects.get(id=person_id)
+                person.name = value
+                person.save()
+                continue
+            if key.endswith('-name'):
+                person_id = key.rstrip('-name').lstrip('new')
+                new_persons.setdefault(person_id, {})
+                new_persons[person_id]['name'] = value
+                continue
+            if key.endswith('-number'):
+                person_id = key.rstrip('-number').lstrip('new')
+                new_persons.setdefault(person_id, {})
+                new_persons[person_id]['number'] = validate_phone_number(value)
+                continue
+            if key.endswith('-groups'):
+                person_id = key.rstrip('-groups').lstrip('new')
+                new_persons.setdefault(person_id, {})
+                new_persons[person_id]['groups'] = [int(group) for group in request.POST.getlist(key)]
+        for _key, value in new_persons.items():
+            person = Person(name=value['name'], phone_number=value['number'])
+            person.save()
+            person.groups.set(value['groups'])
+            person.save()
+        return HttpResponseRedirect('/e37047af-f536-423e-8a72-731cbced13ea/')
+    return HttpResponseRedirect('/e37047af-f536-423e-8a72-731cbced13ea/')
+
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
 def people_list(request):
     '''
     Show all persons with phone numbers and birthdays
@@ -314,6 +354,68 @@ def group_create(request):
         view_data['errors'] = form.errors
         return render(request, 'my_calendar/group.html', view_data)
     return render(request, 'my_calendar/group.html', view_data)
+
+
+#
+# VCF Method
+#
+
+@conditional_decorator(otp_required, not SECRET_KEY_FILE.exists())
+def vcf_create_imports(request):
+    if request.method == 'POST':
+        possible_groups = [(group.id, group.name) for group in Group.objects.all()] #pylint:disable=no-member
+        file_input = request.FILES['file']
+        vcf_data = file_input.read().decode('utf-8')
+        current_person_data = []
+        persons_data = []
+        for line in vcf_data.split('\n'):
+            if 'BEGIN:VCARD' in line:
+                current_person_data = []
+                continue
+            if 'END:VCARD' in line:
+                person_data = {}
+                for data_line in current_person_data:
+                    if data_line.startswith('FN'):
+                        person_data['name'] = data_line[3:].replace('\r', '')
+                        continue
+                    if data_line.startswith('TEL'):
+                        phone_data = data_line[4:]
+                        num_type, number = phone_data.split(':')
+                        person_data[num_type] = number.replace('\r', '')
+                        continue
+                persons_data.append(person_data)
+                continue
+            current_person_data.append(line)
+        # Sort by name
+        persons_data = sorted(persons_data, key=lambda d: d['name'])
+        existing_persons = []
+        new_persons = []
+        for person in persons_data:
+            for key, value in person.items():
+                if key == 'name':
+                    continue
+                matcher = re.match(PHONE_NUMBER_REGEX, value)
+                if not matcher:
+                    continue
+                just_digits = ''.join(digit for digit in value if digit in string.digits)
+                try:
+                    check = Person.objects.get(phone_number=f'+{just_digits}')
+                    if person['name'] != check.name:
+                        existing_persons.append({
+                            'person_id': check.id,
+                            'old_name': check.name,
+                            'new_name': person['name'],
+                        })
+                except Person.DoesNotExist:
+                    new_persons.append({
+                        'name': person['name'],
+                        'number': value,
+                    })
+        return render(request, 'my_calendar/vcf_create_imports.html', {'operation': 'confirm',
+                                                                       'update': existing_persons,
+                                                                       'new': new_persons,
+                                                                       'possible_groups': possible_groups})
+    return render(request, 'my_calendar/vcf_create_imports.html', {'operation': 'upload'})
 
 
 #
