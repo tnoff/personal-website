@@ -15,7 +15,7 @@ from my_calendar.constants import DAYS_OF_WEEK, MONTHS
 from my_calendar.forms import PHONE_NUMBER_REGEX, EventForm, GroupForm, PersonForm, TaskForm
 from my_calendar.models import Event, Group, Person, Task
 from my_calendar.utils import get_datetime_with_timezone
-from my_calendar.utils import find_next_due_date, get_time_with_leading_zeros, validate_phone_number
+from my_calendar.utils import find_next_due_date, get_time_with_leading_zeros, validate_phone_number, print_phone_number
 from website.settings import SECRET_KEY_FILE
 
 # https://stackoverflow.com/questions/10724854/how-to-do-a-conditional-decorator-in-python
@@ -305,10 +305,7 @@ def people_list(request):
     for person in people:
         person.group_names = [group.name for group in person.groups.all()]
         if person.phone_number:
-            phone_number_string = '%s (%s) %s-%s' % (person.phone_number[:-10],
-                                                     person.phone_number[-10:-7],
-                                                     person.phone_number[-7:-4],
-                                                     person.phone_number[-4:])
+            phone_number_string = print_phone_number(person.phone_number)
             person.phone_number = phone_number_string
         if person.birthday:
             person.birthday = person.birthday.strftime('%B %d')
@@ -409,7 +406,7 @@ def vcf_create_imports(request):
                 except Person.DoesNotExist:
                     new_persons.append({
                         'name': person['name'],
-                        'number': value,
+                        'number': print_phone_number(validate_phone_number(value)),
                     })
         return render(request, 'my_calendar/vcf_create_imports.html', {'operation': 'confirm',
                                                                        'update': existing_persons,

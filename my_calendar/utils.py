@@ -25,6 +25,12 @@ def validate_phone_number(phone_number):
         return f'+1{just_digits}'
     return f'+{just_digits}'
 
+def print_phone_number(phone_number):
+    return '%s (%s) %s-%s' % (phone_number[:-10],
+                              phone_number[-10:-7],
+                              phone_number[-7:-4],
+                              phone_number[-4:])
+
 def get_time_with_leading_zeros(datetime_obj):
     '''
     Get HH:MM with leading zeros
