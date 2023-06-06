@@ -394,9 +394,8 @@ def vcf_create_imports(request):
                 matcher = re.match(PHONE_NUMBER_REGEX, value)
                 if not matcher:
                     continue
-                just_digits = ''.join(digit for digit in value if digit in string.digits)
                 try:
-                    check = Person.objects.get(phone_number=f'+{just_digits}')
+                    check = Person.objects.get(phone_number=validate_phone_number(value))
                     if person['name'] != check.name:
                         existing_persons.append({
                             'person_id': check.id,
