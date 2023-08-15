@@ -15,14 +15,11 @@ if SECRET_KEY is None:
         raise SetupException('No secret key file')
     SECRET_KEY = SECRET_KEY_FILE.read_text()
 
-DEBUG = False
 
 ALLOWED_HOSTS = ['tyler-north.com']
 
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-else:
+if SECRET_KEY_FILE.exists():
+    DEBUG = False
     ALLOWED_HOSTS.append('localhost')
 
 # Application definition
@@ -106,7 +103,9 @@ else:
         }
     }
 
-LOG_FILE = BASE_DIR / 'website.log'
+LOG_FILE = '/var/log/website/website.log'
+if SECRET_KEY_FILE.exists():
+    LOG_FILE = BASE_DIR / 'website.log'
 
 # Logging
 # https://docs.djangoproject.com/en/3.0/topics/logging/
