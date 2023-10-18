@@ -33,17 +33,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Two-factor auth apps
-    'django_otp',
-    'django_otp.plugins.otp_static',
-    'django_otp.plugins.otp_totp',
-    'two_factor',
     # Bootstrap
     'bootstrap5',
     'django_bootstrap_icons',
-    # Custom apps
-    'homepage',
-    'my_calendar',
 ]
 
 MIDDLEWARE = [

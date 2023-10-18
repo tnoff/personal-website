@@ -38,27 +38,12 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        {% if user.is_superuser %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="/e37047af-f536-423e-8a72-731cbced13ea/">Persons</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/0d27c6b9-a5d7-4782-9438-93b54b8f98f8/">Tasks</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/5065f9f1-fca3-4a6c-ba4c-e8cb13b0d95e/">Calendar</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/9af57e02-325f-4e49-af70-9e83518a8539/">Admin Page</a>
-                        </li>
-                        {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="/resume/">Resume</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/projects/">Projects</a>
                         </li>
-                        {% endif %}
                     </ul>
                 </div>
             </div>
