@@ -9,28 +9,23 @@
 </style>
 <h1 id="header" align="center">Webpage for Tyler North</h1>
 <hr>
-<div class="row">
-    <div class="col" align="center">
-        <img src="{% static 'pictures/headshot.png' %}" width="60%" height="70%">
+<div align="center">
+    <p>Software Engineer in the San Francisco Bay Area, currently working at <a href="https://www.clari.com/">Clari</a>.</p>
+    <p>Currently working as a Senior Site Reliability engineer, past experience as Senior Software Engineer and Customer Support Engineer.</p>
+    <div id="sub-pages" class="row">
+        <div class="col">
+            <h3><a href="/resume">Resume</a></h3>
+            <p>Skills and past work experience</p>
+        </div>
+        <div class="col">
+            <h3><a href="/projects">Projects</a></h3>
+            <p>Side projects I've published</p>
+        </div>
     </div>
-    <div class="col-7" align="left">
-        <p>Software Engineer in the San Francisco Bay Area, currently working at <a href="https://www.groove.co/">groove.co</a>.</p>
-        <p>Currently working as a Senior Site Reliability engineer, past experience as Senior Software Engineer and Customer Support Engineer.</p>
-        <div id="sub-pages" class="row">
-            <div class="col">
-                <h3><a href="/resume">Resume</a></h3>
-                <p>Skills and past work experience</p>
-            </div>
-            <div class="col">
-                <h3><a href="/projects">Projects</a></h3>
-                <p>Side projects I've published</p>
-            </div>
-        </div>
-        <div id="sub-pages" class="row">
-            <a href="https://linkedin.com/in/tyler-n-89634344">{% bs_icon 'linkedin' size='2.5em' %}</i> Linkedin</a>
-            <a href="mailto: me@tyler-north.com">{% bs_icon 'mailbox'  size='2.5em' %}</i>Email: me@tyler-north.com</a>
-            <a href="https://github.com/tnoff">{% bs_icon 'github'  size='2.5em' %}</i> Github Profile</a>
-        </div>
+    <div id="sub-pages" class="row">
+        <a href="https://linkedin.com/in/tyler-n-89634344">{% bs_icon 'linkedin' size='2.5em' %}</i> Linkedin</a>
+        <a href="mailto: me@tyler-north.com">{% bs_icon 'mailbox'  size='2.5em' %}</i>Email: me@tyler-north.com</a>
+        <a href="https://github.com/tnoff">{% bs_icon 'github'  size='2.5em' %}</i> Github Profile</a>
     </div>
 </div>
 {% endblock %}
