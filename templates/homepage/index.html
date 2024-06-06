@@ -6,16 +6,45 @@
     #sub-pages{
         padding-top: 15px;
     }
+    ul {
+        text-align: center;
+        list-style-position: inside;
+    }
 </style>
-<h1 id="header" align="center">Webpage for Tyler North</h1>
-<hr>
-<div align="center">
-    <p>Software Engineer in the San Francisco Bay Area, currently working at <a href="https://www.clari.com/">Clari</a>.</p>
-    <p>Currently working as a Staff Level Site Reliability engineer, past experience as Software Engineer and Customer Support Engineer.</p>
 
-    <h3><a href="/resume">Resume</a></h3>
-    <p>Summary of past work experience</p>
-    <h3><a href="/projects">Side Projects</a></h3>
-    <p>Short Collection of side projects I've published</p>
+<div align="center">
+    <h1 id="header" align="center">Webpage for Tyler North</h1>
+    <hr>
+    <p>Currently working as a Staff Software Engineer at <a href="https://www.clari.com/">Clari</a>.</p>
+
+    <h1 align="center">Additional Information</h1>
+    <hr>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <h3><a href="/resume">Resume</a></h3>
+                <p>Summary of past work experience</p>
+            </div>
+            <div class="col-sm">
+                <h3><a href="/projects">Side Projects</a></h3>
+                <p>Short Collection of side projects I've published</p>
+            </div>
+        </div>
+    </div>
+    <h1 align="center">Contact Information</h1>
+    <hr>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <a href="https://linkedin.com/in/tyler-n-89634344">Linkedin{% bs_icon 'linkedin' size='2.5em' %}</a>
+            </div>
+            <div class="col-sm">
+                <a href="mailto: me@tyler-north.com">Email{% bs_icon 'mailbox'  size='2.5em' %}</a>
+            </div>
+            <div class="col-sm">
+                <a href="https://github.com/tnoff">Github{% bs_icon 'github'  size='2.5em' %}</a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

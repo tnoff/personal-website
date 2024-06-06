@@ -3,17 +3,17 @@
 {% block content %}
 <h1 align="center">Discord Bot</h1>
 <hr>
-<p>A discord bot framework written in python. Requires a valid discord bot <a href="https://discord.com/developers/docs/topics/oauth2#bots">token</a>.</p>
-<p>Includes basic database support, metadata commands, and plugin support via importing a base "Cog" class. This base cog class also includes support for retries of your custom commands.</p>
-<p>You can view and download the source code on <a href="https://github.com/tnoff/discord-bot">github</a>.</p>
-<p>I keep some discord plugins I maintain in a separate repo, so they are not included by default. There are some example plugins I've written available in <a href="https://github.com/tnoff/discord-bot-plugins">github</a>. These plugins include support for:</p>
+<p>A <a href="https://discord.com/">discord</a> bot framework written in python. Supports starting a bot via a token, configuration via YAML files, database tables/sessions, and custom plugins.</p>
+<p>Includes some pre-written functions for:</p>
 <ul>
-    <li>Music: Play audio from youtube in Voice Chat</li>
-    <li>Markov Bot: Mimic user chat using Markov chains</li>
-    <li>Urban Dictionary: Lookup words in urban dictionary</li>
-    <li>Role Management: Manage roles in hierarchical fashion</li>
-    <li>Auto Message Delete: Delete messages from channel on timer</li>
+    <li><a href="https://github.com/tnoff/discord-bot/blob/main/docs/music.md">Youtube Channel Audio</a>: Play audio from youtube in voice channels</li>
+    <li><a href="https://github.com/tnoff/discord-bot/blob/main/docs/urban.md">Urban Dictionary</a>: Looking up words/phrases in Urban Dictionary</li>
+    <li><a href="https://github.com/tnoff/discord-bot/blob/main/docs/markov.md">Markov Chat Bot</a>: Generate text from channel history via <a href="https://en.wikipedia.org/wiki/Markov_chain">Markov Chains</a></li>
+    <li><a href="https://github.com/tnoff/discord-bot/blob/main/docs/delete_messages.md">Message Deletion</a>: Configure message deletion in channels after a certain amount of time</li>
+    <li><a href="https://github.com/tnoff/discord-bot/blob/main/docs/role.md">Advanced Role Based Access Control</a>: Configure more advanced role controls than what Discord allows by default</li>
 </ul>
+<p>You can view and download the source code on <a href="https://github.com/tnoff/discord-bot">github</a>.</p>
+
 
 <h1 align="center">Hathor Podcast Manager</h1>
 <hr>
@@ -36,7 +36,7 @@
 <h1 align="center">Backup Tool</h1>
 <hr>
 <p>Backup Tool is a python package and command line tool that can be used to encyrpt and backup local files to <a href="https://docs.cloud.oracle.com/en-us/iaas/Content/Object/Concepts/objectstorageoverview.htm">Oracle Cloud Infrastructures Object Storage</a>. Once backed up to OCI Object Storage, files can also be downloaded and decrypted to restore local copies of files.</p>
-<p>Backup Tool uses a basic AES encryption method with a password of 16, 24, or 32 characters in length. Files are encrypted before they are uploaded to OCI Object Storage to be backed up, and local md5 sums of the original file and the encrypted file are stored in a local SQLITE database.</p>
+<p>Backup Tool uses a basic <a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES Encryption</a> method with a password of 16, 24, or 32 characters in length. Files are encrypted before they are uploaded to OCI Object Storage to be backed up, and local md5 sums of the original file and the encrypted file are stored in a local SQLITE database.</p>
 <p>Encrypted files can then be downloaded, and decrypted using the same password. Backup tool will verify the downloaded file and the decrypted files md5 sum against what was saved in the database.</p>
 <p>You can view and download the source code on <a href="https://github.com/tnoff/backup-tool">github</a>.</p>
 {% endblock %}
