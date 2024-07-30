@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Bootstrap
-    'bootstrap5',
+    'django_bootstrap5',
     'django_bootstrap_icons',
 ]
 
@@ -156,8 +156,3 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = str(BASE_DIR / 'static')
-
-# Login settings
-LOGIN_URL = 'two_factor:login'
-LOGIN_REDIRECT_URL = 'two_factor:profile'
-TWO_FACTOR_QR_FACTORY = 'qrcode.image.pil.PilImage'
