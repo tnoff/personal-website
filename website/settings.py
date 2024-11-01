@@ -10,6 +10,7 @@ BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SECRET_KEY_FILE = BASE_DIR / 'secret_key'
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', None)
+DOCKER_DEPLOY = os.environ.get('DOCKER_DEPLOY', False)
 if SECRET_KEY is None:
     if not SECRET_KEY_FILE.exists():
         raise SetupException('No secret key file')
@@ -18,7 +19,7 @@ if SECRET_KEY is None:
 
 ALLOWED_HOSTS = ['tyler-north.com']
 
-if SECRET_KEY_FILE.exists():
+if SECRET_KEY_FILE.exists() or DOCKER_DEPLOY:
     DEBUG = True
     ALLOWED_HOSTS.append('localhost')
 
@@ -72,14 +73,14 @@ WSGI_APPLICATION = 'website.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-if 'POSTGRES_DATABASE' in os.environ:
+if 'PG_DATABASE' in os.environ:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ['POSTGRES_DATABASE'],
-            'USER': os.environ['POSTGRES_USER'],
-            'PASSWORD': os.environ['POSTGRES_PASSWORD'],
-            'HOST': os.environ['POSTGRES_HOST'],
+            'NAME': os.environ['PG_DATABASE'],
+            'USER': os.environ['PG_USER'],
+            'PASSWORD': os.environ['PG_PASSWORD'],
+            'HOST': os.environ['PG_HOST'],
             'PORT': '5432',
         }
     }
