@@ -26,10 +26,8 @@ if SECRET_KEY_FILE.exists() or DOCKER_DEPLOY:
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Bootstrap
@@ -72,25 +70,6 @@ WSGI_APPLICATION = 'website.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
-if 'PG_DATABASE' in os.environ:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ['PG_DATABASE'],
-            'USER': os.environ['PG_USER'],
-            'PASSWORD': os.environ['PG_PASSWORD'],
-            'HOST': os.environ['PG_HOST'],
-            'PORT': '5432',
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
 
 LOG_FILE = '/var/log/website/website.log'
 if SECRET_KEY_FILE.exists():
