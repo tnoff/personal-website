@@ -64,6 +64,7 @@ jobs:
       contents: read
     needs:
       - tag_build
+      - build_docker_tag
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -89,6 +90,7 @@ jobs:
       contents: read
     needs:
       - tag_build
+      - build_docker_tag
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
