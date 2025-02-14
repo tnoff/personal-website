@@ -3,47 +3,40 @@
 {% load bootstrap_icons %}
 {% block content %}
 <style type="text/css">
-    #sub-pages{
+    #header {
         padding-top: 15px;
+        color: #3D3D3D;
     }
     ul {
         text-align: center;
         list-style-position: inside;
     }
+    p {
+        font-size: 20px;
+    }
 </style>
 
-<div align="center">
+<div>
     <h1 id="header" align="center">Webpage for Tyler North</h1>
     <hr>
-    <p>Currently working as a Staff Software Engineer at <a href="https://www.clari.com/">Clari</a>.</p>
-
-    <h1 align="center">Additional Information</h1>
-    <hr>
     <div class="container">
-        <div class="row">
-            <div class="col-sm">
-                <h3><a href="/resume">Resume</a></h3>
-                <p>Summary of past work experience</p>
-            </div>
-            <div class="col-sm">
-                <h3><a href="/projects">Side Projects</a></h3>
-                <p>Short Collection of side projects I've published</p>
-            </div>
-        </div>
+        <p>I'm a software engineer living in the Bay Area, California. I'm currently working as a Staff Software Engineer at <a href="https://www.clari.com/">Clari</a>.</p>
+        <p>Outside of work, I enjoy spending time playing disc golf, hanging out with family, playing music, and working on various coding side projects.</p>
     </div>
-    <h1 align="center">Contact Information</h1>
+
+    <h1 id="header" align="center">Additional Information</h1>
     <hr>
     <div class="container">
-        <div class="row">
-            <div class="col-sm">
-                <a href="https://linkedin.com/in/tyler-n-89634344">Linkedin{% bs_icon 'linkedin' size='2.5em' %}</a>
-            </div>
-            <div class="col-sm">
-                <a href="mailto: me@tyler-north.com">Email{% bs_icon 'mailbox'  size='2.5em' %}</a>
-            </div>
-            <div class="col-sm">
-                <a href="https://github.com/tnoff">Github{% bs_icon 'github'  size='2.5em' %}</a>
-            </div>
+        <p>For work related things, feel free to read my <a href="/resume">Resume</a>. I also have a few <a href="/projects">side project apps</a> that I've published if you're interested in reading.</p>
+    </div>
+    <h1 id="header" align="center">Contact</h1>
+    <hr>
+    <div class="container">
+        <p>Feel free to contact me on the following platforms. You can already reach me at my email: <a href="mailto: me@tyler-north.com">me@tyler-north.com</a>.</p>
+        <div align="center">
+            <p><a href="https://linkedin.com/in/tyler-n-89634344">Linkedin{% bs_icon 'linkedin' size='2.5em' %}</a></p>
+            <p><a href="https://github.com/tnoff">Github{% bs_icon 'github'  size='2.5em' %}</a></p>
+            <p><a href="https://bsky.app/profile/tnoff.bsky.social">Bluesky{% bs_icon 'person-square'  size='2.5em' %}</a></p>
         </div>
     </div>
 </div>
