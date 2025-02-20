@@ -14,52 +14,59 @@
     <!-- Custom CSS Styles -->
     <style type="text/css">
         body {
-            background-color: #EDEDED;
+            background-color: #cee5ef;
+            font-family: Garamond, serif;
+            
         }
-
-        nav {
-            background-color: #C6D1D9;
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-
-        #main-page {
-            padding-left: 30px;
-            padding-right: 30px;
-        }
-        #header {
-            padding-top: 15px;
-            color: #3D3D3D;
-        }
-        ul {
-            list-style-position: inside;
-        }
-        li {
-            font-size: 20px;
+        a {
+            color: #083a87;
+            background-color: transparent;
+            text-decoration: none;
         }
         p {
             font-size: 20px;
+            color: #141616;
+        }
+        li {
+            font-size: 20px;
+            color: #141616;  
+        }
+        footer {
+            padding-top: 20px;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+        }
+        .header {
+            padding-top: 15px;
+            color: #141616;
         }
     </style>
 
     <body>
-        <!-- Main content block -->
         <nav class="navbar navbar-expand-sm justify-content-center">
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" href="/">Home</a>
                 </li>
+                <li>_</li>
                 <li class="nav-item">
                     <a class="nav-link" href="/resume">Resume</a>
                 </li>
+                <li>_</li>
                 <li class="nav-item">
                     <a class="nav-link" href="/projects">Projects</a>
                 </li>
             </ul>
         </nav> 
-        <div id="main-page">
+        <!-- Main content block -->
+        <div class="container">
         {% block content %}
         {% endblock %}
         </div>
+        <footer>
+            <p>Author: Tyler North. Last updated 2025.</p>
+        </footer>
     </body>
 </html>
