@@ -20,9 +20,12 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       - name: Log in to DigitalOcean Container Registry with short-lived credentials
         run: doctl registry login --expiry-seconds 1200
+      - name: Get github hash
+        id: github-hash
+        run: echo "github_hash=$(echo $GITHUB_SHA | head -c7)" >> $GITHUB_OUTPUT
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           push: true
           context: .
-          tags: tnorth-apps/tyler-north.com:latest,tnorth-apps/tyler-north.com:$(echo $GITHUB_SHA | head -c7)
+          tags: tnorth-apps/tyler-north.com:latest,tnorth-apps/tyler-north.com:${{ steps.github-hash.outputs.github_hash }}
