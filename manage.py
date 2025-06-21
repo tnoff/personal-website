@@ -3,9 +3,24 @@
 import os
 import sys
 
+from opentelemetry.instrumentation.django import DjangoInstrumentor
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+
+def setup_otel():
+    trace.set_tracer_provider(TracerProvider())
+    span_processor = BatchSpanProcessor(OTLPSpanExporter())
+    trace.get_tracer_provider().add_span_processor(span_processor)
+    DjangoInstrumentor().instrument()
 
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'website.settings')
+
+    # This call is what makes the Django application be instrumented
+    setup_otel()
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
