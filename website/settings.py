@@ -23,6 +23,11 @@ if SECRET_KEY_FILE.exists() or DOCKER_DEPLOY:
     DEBUG = True
     ALLOWED_HOSTS.append('localhost')
 
+# OCI Webhook setup
+DISCORD_WEBHOOK_URL = os.environ.get('DISCORD_WEBHOOK_URL', None)
+OCI_WEBHOOK_USER = os.environ.get('OCI_WEBHOOK_USER', None)
+OCI_WEBHOOK_PASS = os.environ.get('OCI_WEBHOOK_PASS', None)
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -66,6 +71,25 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'website.wsgi.application'
+
+if 'PG_DB' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ['PG_DB'],
+            'USER': os.environ['PG_USER'],
+            'PASSWORD': os.environ['PG_PASSWORD'],
+            'HOST': os.environ['PG_HOST'],
+            'PORT': '5432',
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Database
