@@ -25,7 +25,9 @@ def setup_otel():
     log_exporter = OTLPLogExporter()
     logger_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
     handler = LoggingHandler(level=logging.INFO, logger_provider=logger_provider)
-    logging.getLogger().addHandler(handler)
+    root_logger = logging.getLogger()
+    root_logger.addHandler(handler)
+    root_logger.setLevel(logging.INFO)
 
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'website.settings')

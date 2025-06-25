@@ -55,6 +55,7 @@ def check_authorization(headers):
         return True
     auth_header = headers.get('Authorization')
     logger.info(f'Received auth header {auth_header}')
+    print(f'Received headers {headers}')
     if not auth_header or not auth_header.startswith('Basic '):
         return False
 
@@ -80,6 +81,7 @@ def oci_to_discord(request):
         return JsonResponse({"status": "ERROR"})
 
     logger.info(f'Message data received {data}')
+    print(f'Message data received {data}')
     # Extract message from OCI format
     message = data.get("message", "No message provided.")
 
