@@ -2,6 +2,8 @@ from base64 import b64decode
 from requests import post
 from json import loads
 from json.decoder import JSONDecodeError
+import logging
+
 from django.db import connection
 from django.db.utils import OperationalError
 
@@ -10,6 +12,8 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+
+logger = logging.getLogger(__name__)
 
 def home_page(request):
     '''
@@ -50,6 +54,7 @@ def check_authorization(headers):
     if not settings.OCI_WEBHOOK_USER or not settings.OCI_WEBHOOK_PASS:
         return True
     auth_header = headers.get('Authorization')
+    logger.debug(f'Received auth header {auth_header}')
     if not auth_header or not auth_header.startswith('Basic '):
         return False
 
@@ -67,7 +72,7 @@ def check_authorization(headers):
 def oci_to_discord(request):
     # Basic Auth validation
     if not check_authorization(request.headers):
-        return HttpResponse('Unauthorized', status=401)
+        pass
 
     try:
         data = loads(request.body)
