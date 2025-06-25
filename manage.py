@@ -31,7 +31,8 @@ def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'website.settings')
 
     # This call is what makes the Django application be instrumented
-    setup_otel()
+    if 'test' not in sys.argv:
+        setup_otel()
 
     try:
         from django.core.management import execute_from_command_line
