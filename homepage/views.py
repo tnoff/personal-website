@@ -1,7 +1,7 @@
 from base64 import b64decode
 from requests import post
 from json import loads
-
+from json.decoder import JSONDecodeError
 from django.db import connection
 from django.db.utils import OperationalError
 
@@ -69,7 +69,10 @@ def oci_to_discord(request):
     if not check_authorization(request.headers):
         return HttpResponse('Unauthorized', status=401)
 
-    data = loads(request.body)
+    try:
+        data = loads(request.body)
+    except JSONDecodeError:
+        return JsonResponse({"status": "ERROR"})
 
     # Extract message from OCI format
     message = data.get("message", "No message provided.")
