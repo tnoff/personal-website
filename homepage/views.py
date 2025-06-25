@@ -54,7 +54,7 @@ def check_authorization(headers):
     if not settings.OCI_WEBHOOK_USER or not settings.OCI_WEBHOOK_PASS:
         return True
     auth_header = headers.get('Authorization')
-    logger.debug(f'Received auth header {auth_header}')
+    logger.info(f'Received auth header {auth_header}')
     if not auth_header or not auth_header.startswith('Basic '):
         return False
 
@@ -79,6 +79,7 @@ def oci_to_discord(request):
     except JSONDecodeError:
         return JsonResponse({"status": "ERROR"})
 
+    logger.info(f'Message data received {data}')
     # Extract message from OCI format
     message = data.get("message", "No message provided.")
 
