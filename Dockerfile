@@ -6,6 +6,7 @@ RUN mkdir -p /opt/web /var/log/website
 COPY homepage/ /opt/web/homepage
 COPY templates/ /opt/web/templates
 COPY website/ /opt/web/website
+COPY otlp.py /opt/web/
 COPY startup.sh requirements.txt manage.py /opt/web/
 RUN chmod +x /opt/web/startup.sh
 
