@@ -1,6 +1,5 @@
-from base64 import b64decode
 from requests import post
-from json import loads
+from json import loads, dumps
 from json.decoder import JSONDecodeError
 import logging
 
@@ -48,45 +47,18 @@ def health_check(_request):
         return HttpResponse('OK', status=200)
     except OperationalError:
         return HttpResponse('FAIL', status=500)
-
-
-def check_authorization(headers):
-    auth_header = headers.get('Authorization')
-    if not settings.OCI_WEBHOOK_USER or not settings.OCI_WEBHOOK_PASS:
-        return True
-
-    if not auth_header or not auth_header.startswith('Basic '):
-        return False
-
-    encoded_credentials = auth_header.split(' ')[1]
-    decoded = b64decode(encoded_credentials).decode('utf-8')
-    username, password = decoded.split(':', 1)
-
-    if username != settings.OCI_WEBHOOK_USER or password != settings.OCI_WEBHOOK_PASS:
-        return False
-    return True
     
-
 @csrf_exempt
 @require_POST
 def oci_to_discord(request):
-    logger.info(f'OCI Received headers {request.headers} and body {request.body}')
-    # Basic Auth validation
-    if not check_authorization(request.headers):
-        pass
-
     try:
         data = loads(request.body)
     except JSONDecodeError:
         return JsonResponse({"status": "ERROR"})
 
-    logger.info(f'Message data received {data}')
-    print(f'Message data received {data}')
-    # Extract message from OCI format
-    message = data.get("message", "No message provided.")
 
     # Send to Discord
-    discord_payload = {"content": message}
+    discord_payload = {"content": f'```{dumps(data, indent=2)}```'}
     if not settings.DISCORD_WEBHOOK_URL:
         return JsonResponse({"status": "OK"})
     discord_response = post(settings.DISCORD_WEBHOOK_URL, json=discord_payload)
