@@ -9,9 +9,10 @@ from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+
 from opentelemetry._logs import set_logger_provider
+from opentelemetry.sdk._logs import LoggerProvider
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
-from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
 
 def setup_otel():
@@ -20,14 +21,10 @@ def setup_otel():
     trace.get_tracer_provider().add_span_processor(span_processor)
     DjangoInstrumentor().instrument()
 
-    logger_provider = LoggerProvider()
-    set_logger_provider(logger_provider)
-    log_exporter = OTLPLogExporter()
-    logger_provider.add_log_record_processor(BatchLogRecordProcessor(log_exporter))
-    handler = LoggingHandler(level=logging.INFO, logger_provider=logger_provider)
-    root_logger = logging.getLogger()
-    root_logger.addHandler(handler)
-    root_logger.setLevel(logging.INFO)
+    log_provider = LoggerProvider()
+    log_provider.add_log_record_processor(BatchLogRecordProcessor(OTLPLogExporter()))
+    set_logger_provider(log_provider)
+    logging.basicConfig(level=logging.INFO)
 
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'website.settings')
