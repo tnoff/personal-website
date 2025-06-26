@@ -48,7 +48,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'website.middleware.OpenTelemetryEnrichMiddleware'
 ]
 
 ROOT_URLCONF = 'website.urls'
@@ -125,12 +124,17 @@ LOGGING = {
             'formatter': 'default',
             'level': 'DEBUG',
         },
+        "otlp": {"class": "otlp.CustomLoggingHandler"},
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'rotated_logs'],
+            'handlers': ['console', 'rotated_logs', 'otlp'],
             'propagate': True,
             'level': 'DEBUG',
+        },
+        'homepage': {
+            "handlers": ["console", "otlp"],
+            "level": "DEBUG",
         },
     }
 }

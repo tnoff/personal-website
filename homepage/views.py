@@ -6,12 +6,12 @@ import logging
 
 from django.db import connection
 from django.db.utils import OperationalError
-
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+
 
 logger = logging.getLogger(__name__)
 
@@ -51,11 +51,10 @@ def health_check(_request):
 
 
 def check_authorization(headers):
+    auth_header = headers.get('Authorization')
     if not settings.OCI_WEBHOOK_USER or not settings.OCI_WEBHOOK_PASS:
         return True
-    auth_header = headers.get('Authorization')
-    logger.info(f'Received auth header {auth_header}')
-    print(f'Received headers {headers}')
+
     if not auth_header or not auth_header.startswith('Basic '):
         return False
 
@@ -71,6 +70,7 @@ def check_authorization(headers):
 @csrf_exempt
 @require_POST
 def oci_to_discord(request):
+    logger.info(f'OCI Received headers {request.headers} and body {request.body}')
     # Basic Auth validation
     if not check_authorization(request.headers):
         pass
