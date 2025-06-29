@@ -136,6 +136,15 @@ LOGGING = {
             "handlers": ["console", "otlp"],
             "level": "DEBUG",
         },
+        'root': {
+            'handlers': ['console', 'rotated_logs', 'otlp'],
+            'level': 'WARNING',
+        },
+        'django.request': {
+            'handlers': ['console', 'rotated_logs', 'otlp'],
+            'level': 'ERROR',
+            'propagate': False,  # Important: prevents duplicate logs
+        },
     }
 }
 
