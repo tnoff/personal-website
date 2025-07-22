@@ -99,6 +99,10 @@ LOG_FILE = '/var/log/website/website.log'
 if SECRET_KEY_FILE.exists():
     LOG_FILE = BASE_DIR / 'website.log'
 
+LOG_HANDLERS = ['console', 'rotated_logs', 'otlp']
+if DEBUG:
+    LOG_HANDLERS = ['console']
+
 # Logging
 # https://docs.djangoproject.com/en/3.0/topics/logging/
 LOGGING = {
@@ -128,20 +132,20 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'rotated_logs', 'otlp'],
+            'handlers': LOG_HANDLERS,
             'propagate': True,
             'level': 'DEBUG',
         },
         'homepage': {
-            "handlers": ["console", "otlp"],
+            "handlers": LOG_HANDLERS,
             "level": "DEBUG",
         },
         'root': {
-            'handlers': ['console', 'rotated_logs', 'otlp'],
+            'handlers': LOG_HANDLERS,
             'level': 'WARNING',
         },
         'django.request': {
-            'handlers': ['console', 'rotated_logs', 'otlp'],
+            'handlers': LOG_HANDLERS,
             'level': 'ERROR',
             'propagate': False,  # Important: prevents duplicate logs
         },
