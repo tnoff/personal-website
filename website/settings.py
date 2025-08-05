@@ -19,6 +19,7 @@ if SECRET_KEY is None:
 
 ALLOWED_HOSTS = ['tyler-north.com']
 
+DEBUG = False
 if SECRET_KEY_FILE.exists() or DOCKER_DEPLOY:
     DEBUG = True
     ALLOWED_HOSTS.append('localhost')
