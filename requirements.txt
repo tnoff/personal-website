@@ -5,4 +5,4 @@ django-bootstrap5==25.2
 opentelemetry-exporter-otlp
 opentelemetry-sdk==1.35.0
 opentelemetry-instrumentation-django
-psycopg2==2.9.10
+psycopg2==2.9.11
