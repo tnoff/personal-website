@@ -1,30 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 id="header" align="center">Side Projects</h1>
+<h1 class="header" align="center">Coding Projects</h1>
 
-<h2 id="header">Discord Bot</h2>
+<h2 class="header">Discord Bot with Music Player</h2>
 <hr>
 <p>A <a href="https://discord.com/">discord</a> bot framework written in python. Supports starting a bot via a token, configuration via YAML files, database tables/sessions, and custom plugins.</p>
 <p>Includes some pre-written functions for:</p>
 <ul>
-    <li><a href="https://github.com/tnoff/discord-bot/blob/main/docs/music.md">Youtube Channel Audio</a>: Play audio from Youtube in voice channels</li>
+    <li><a href="https://github.com/tnoff/discord-bot/blob/main/docs/music.md">Channel Audio</a>: Play audio from Youtube (and other sites) in voice channels</li>
     <li><a href="https://github.com/tnoff/discord-bot/blob/main/docs/urban.md">Urban Dictionary</a>: Looking up words/phrases in Urban Dictionary</li>
-    <li><a href="https://github.com/tnoff/discord-bot/blob/main/docs/markov.md">Markov Chat Bot</a>: Generate text from channel history via <a href="https://en.wikipedia.org/wiki/Markov_chain">Markov Chains</a></li>
+    <li><a href="https://github.com/tnoff/discord-bot/blob/main/docs/markov.md">Markov</a>: Generate text from channel history via <a href="https://en.wikipedia.org/wiki/Markov_chain">Markov Chains</a></li>
     <li><a href="https://github.com/tnoff/discord-bot/blob/main/docs/delete_messages.md">Message Deletion</a>: Configure message deletion in channels after a certain amount of time</li>
     <li><a href="https://github.com/tnoff/discord-bot/blob/main/docs/role.md">Advanced Role Based Access Control</a>: Configure more advanced role controls than what Discord allows by default</li>
 </ul>
-<p>You can view and download the source code on <a href="https://github.com/tnoff/discord-bot">Github</a>.</p>
+<p>You can view and download the source code via <a href="https://github.com/tnoff/discord-bot">Github</a>.</p>
 
+<h2 class="header">Enheduanna Note Manager</h2>
+<hr>
 
-<h2 id="header">Hathor Podcast Manager</h2>
+<p>Command line tool written in Python for writing, organizing, and enhancing note files written in Markdown. Helps track work done throughout the day and keeping up with follow ups, and other notes kept throughout the day. Contains functions to pull notes into separate documents in specified directories, often helpful for writing first drafts of Runbooks and other documentation.</p>
+
+<p>You can view and download the source code via <a href="https://github.com/tnoff/enheduanna">Github</a>.</p>
+
+<h2 class="header">DapperTable Paginated ASCII Table Formatter</h2>
+<hr>
+
+<p>Useful for chatbots that send large text blocks to apps like Discord or Slack, paginates text by length and splits into smaller blocks of text to send via an API and avoid character size limits. Supports formatting input into tables for easier readability.</p>
+
+<p>You can view and download the source code via <a href="https://github.com/tnoff/dappertable">Github</a>.</p>
+
+<h2 class="header">Hathor Podcast Manager</h2>
 <hr>
 <p>Hathor is a python package and command line tool that can be used to download and manage media files from RSS Feeds and Youtube Channels.</p>
-<p>The package includes two command line scripts:</p>
-<ul>
-    <li><code>hathor</code>: CLI Script for Hathor package</li>
-    <li><code>audio-tool</code>: A small cli that can edit audio file metadata</li>
-</ul>
 <p>Data from hathor is stored in a SQLITE database, where a "podcast" configuration will contain the following:</p>
 <ul>
     <li>Name: Internal reference name given to the podcast
@@ -33,23 +41,23 @@
 </ul>
 <p>Once hathor has this data for a given podcast, a sync can be run to gather the latest "episodes", and download them if requested. When a given episode is downloaded, hathor can also configure the audio metadata for the file.</p>
 <p>In addition, plugins can be added to hathor, which can be configured to run after any defined function.</p>
-<p>You can view and download the source code on <a href="https://github.com/tnoff/hathor">Github</a>.</p>
+<p>You can view and download the source code via <a href="https://github.com/tnoff/hathor">Github</a>.</p>
 
-<h2 id="header">Backup Tool</h2>
+<h2 class="header">Backup Tool</h2>
 <hr>
 <p>Backup Tool is a python package and command line tool that can be used to encrypt and backup local files to <a href="https://docs.cloud.oracle.com/en-us/iaas/Content/Object/Concepts/objectstorageoverview.htm">Oracle Cloud Infrastructures Object Storage</a>.</p>
 <p>Backup Tool uses a basic <a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES Encryption</a> method with a password of 16, 24, or 32 characters in length.</p>
 <p>Local file paths, md5 sums for the original file and the encrypted file, and object name of the uploaded file are all stored in a local sqlite database.</p>
-<p>You can view and download the source code on <a href="https://github.com/tnoff/backup-tool">Github</a>.</p>
+<p>You can view and download the source code via <a href="https://github.com/tnoff/backup-tool">Github</a>.</p>
 
-<h2 id="header">Public Transit</h2>
+<h2 class="header">Public Transit</h2>
 <hr>
 <p>A python package that can get the latest arrival predictions for <a href="https://www.actransit.org/">AC Transit</a>, <a href="https://www.bart.gov/">Bart</a>, and <a href="https://www.sfmta.com/muni-transit">SF-Muni</a>.</p>
 <p>Contains wrapper scripts to store commonly looked up stops and routes.</p>
-<p>You can view and download the source code on <a href="https://github.com/tnoff/public-transit">Github</a>.</p>
+<p>You can view and download the source code via <a href="https://github.com/tnoff/public-transit">Github</a>.</p>
 
-<h2 id="header">Fork of MMM-BartTimes</h2>
+<h2 class="header">Fork of MMM-BartTimes</h2>
 <hr>
 <p>A fork of the <a href="https://magicmirror.builders/">MagicMirror</a> Bart arrival time module that adds in Bart service advisories.</p>
-<p>You can view and download the source code on <a href="https://github.com/tnoff/MMM-BartTimes">Github</a>.</p>
+<p>You can view and download the source code via <a href="https://github.com/tnoff/MMM-BartTimes">Github</a>.</p>
 {% endblock %}
