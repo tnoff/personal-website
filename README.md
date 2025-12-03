@@ -62,16 +62,27 @@ docker build -t personal-website .
 
 ### Run the Container
 
+**Default (port 8080):**
 ```bash
 docker run -p 8080:8080 personal-website
 ```
 
 The site will be available at http://localhost:8080
 
-### Run with Custom OpenTelemetry Endpoint
+**Custom port:**
+```bash
+docker run -p 3000:3000 \
+  -e PORT="3000" \
+  personal-website
+```
+
+The site will be available at http://localhost:3000
+
+### Run with Custom Configuration
 
 ```bash
-docker run -p 8080:8080 \
+docker run -p 9000:9000 \
+  -e PORT="9000" \
   -e OTEL_EXPORTER_OTLP_ENDPOINT="your-collector:4317" \
   personal-website
 ```
@@ -114,7 +125,21 @@ The site is designed to be deployed via Docker on Kubernetes:
 1. Build the Docker image with a version tag
 2. Push to your container registry
 3. Deploy to Kubernetes with appropriate environment variables
-4. Configure `OTEL_EXPORTER_OTLP_ENDPOINT` to point to your OpenTelemetry collector
+4. Configure environment variables as needed
+
+### Environment Variables
+
+- `PORT` - Port for Nginx to listen on (default: `8080`)
+- `OTEL_EXPORTER_OTLP_ENDPOINT` - OpenTelemetry collector endpoint (default: `localhost:4317`)
+
+Example Kubernetes deployment snippet:
+```yaml
+env:
+  - name: PORT
+    value: "8080"
+  - name: OTEL_EXPORTER_OTLP_ENDPOINT
+    value: "otel-collector.monitoring.svc.cluster.local:4317"
+```
 
 ## License
 

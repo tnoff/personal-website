@@ -16,8 +16,9 @@ COPY hugo-site/nginx.conf /etc/nginx/nginx.conf
 COPY hugo-site/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
-# Set default OTLP endpoint
+# Set default environment variables
 ENV OTEL_EXPORTER_OTLP_ENDPOINT="localhost:4317"
+ENV PORT="8080"
 
-EXPOSE 8080
+EXPOSE ${PORT}
 ENTRYPOINT ["/docker-entrypoint.sh"]
