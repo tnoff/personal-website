@@ -1,14 +1,15 @@
-*.sqlite3
-*.pyc
+# Hugo
+hugo-site/public/
+hugo-site/resources/
+hugo-site/.hugo_build.lock
+
+# Static vendor assets (downloaded from CDN)
+hugo-site/static/css/bootstrap*.css
+hugo-site/static/js/bootstrap*.js
+hugo-site/static/fonts/bootstrap-icons.*
+
+# Editor
 *.swp
-website/local_settings.py
-my.cnf
-secret_key
-certs/
-local_static/
-secret/
-logs/
-website.log*
-*.sqlite3
-geckodriver.log
-static/admin/
+
+# Local development
+.DS_Store

@@ -1,34 +1,23 @@
-FROM python:3.14-slim-bookworm
+FROM nginx:1.27-alpine-otel
 
-RUN apt-get update && apt-get install -y gcc libpq-dev git
+# Install Hugo
+RUN apk add --no-cache hugo
 
-RUN mkdir -p /opt/web /var/log/website
-COPY homepage/ /opt/web/homepage
-COPY templates/ /opt/web/templates
-COPY website/ /opt/web/website
-COPY otlp.py /opt/web/
-COPY startup.sh requirements.txt manage.py /opt/web/
-RUN chmod +x /opt/web/startup.sh
+# Build the site
+WORKDIR /src
+COPY hugo-site/ .
+RUN hugo --minify
 
-RUN pip install -r /opt/web/requirements.txt
+# Copy built site to nginx
+RUN cp -r /src/public/* /usr/share/nginx/html/ && rm -rf /src
 
-# https://github.com/open-telemetry/opentelemetry-python-contrib/pull/3648
-# Bug in upstream, fix pending
-# Remove git install above and uninstall below
-WORKDIR /tmp
-RUN git clone https://github.com/open-telemetry/opentelemetry-python.git
-WORKDIR /tmp/opentelemetry-python
-RUN pip uninstall opentelemetry-semantic-conventions opentelemetry-api opentelemetry-sdk -y && pip install opentelemetry-semantic-conventions/ opentelemetry-api/ opentelemetry-sdk/
-WORKDIR /tmp
-RUN git clone https://github.com/tnoff/opentelemetry-python-contrib.git
-WORKDIR /tmp/opentelemetry-python-contrib
-RUN  git checkout tnorth/fix
-RUN pip uninstall opentelemetry-instrumentation-wsgi opentelemetry-instrumentation-django opentelemetry-instrumentation opentelemetry-util-http -y
-RUN pip install opentelemetry-instrumentation/ instrumentation/opentelemetry-instrumentation-wsgi/ instrumentation/opentelemetry-instrumentation-django/ util/opentelemetry-util-http/
+# Copy nginx config and entrypoint
+COPY hugo-site/nginx.conf /etc/nginx/nginx.conf
+COPY hugo-site/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 
-WORKDIR /opt/web
-RUN rm -rf  /tmp/opentelemetry-python /tmp/opentelemetry-python-contrib
+# Set default OTLP endpoint
+ENV OTEL_EXPORTER_OTLP_ENDPOINT="localhost:4317"
 
-RUN apt-get remove -y gcc git && apt-get autoremove -y
-
-CMD ["/opt/web/startup.sh"]
+EXPOSE 8080
+ENTRYPOINT ["/docker-entrypoint.sh"]

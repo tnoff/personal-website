@@ -15,5 +15,5 @@ matrix:
       - span.keys
       - :matches(.MathJax_Preview, .md-nav__link, .md-footer-custom-text, .md-source__repository, .headerlink, .md-icon)
   sources:
-  - templates/*.html
-  - templates/homepage/*.html
+  - hugo-site/layouts/**/*.html
+  - hugo-site/content/*.html
