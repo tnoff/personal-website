@@ -1,4 +1,4 @@
-FROM nginx:1.27-alpine-otel
+FROM nginx:1.29-alpine-otel
 
 # Install Hugo
 RUN apk add --no-cache hugo
