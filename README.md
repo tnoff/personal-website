@@ -84,6 +84,7 @@ The site will be available at http://localhost:3000
 docker run -p 9000:9000 \
   -e PORT="9000" \
   -e OTEL_EXPORTER_OTLP_ENDPOINT="your-collector:4317" \
+  -e OTEL_SERVICE_NAME="personal-website" \
   personal-website
 ```
 
@@ -131,6 +132,7 @@ The site is designed to be deployed via Docker on Kubernetes:
 
 - `PORT` - Port for Nginx to listen on (default: `8080`)
 - `OTEL_EXPORTER_OTLP_ENDPOINT` - OpenTelemetry collector endpoint (default: `localhost:4317`)
+- `OTEL_SERVICE_NAME` - Service name for OpenTelemetry traces (required for proper trace identification)
 
 Example Kubernetes deployment snippet:
 ```yaml
@@ -139,6 +141,8 @@ env:
     value: "8080"
   - name: OTEL_EXPORTER_OTLP_ENDPOINT
     value: "otel-collector.monitoring.svc.cluster.local:4317"
+  - name: OTEL_SERVICE_NAME
+    value: "personal-website"
 ```
 
 ## License
