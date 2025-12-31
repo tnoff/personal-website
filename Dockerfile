@@ -16,9 +16,21 @@ COPY hugo-site/nginx.conf /etc/nginx/nginx.conf
 COPY hugo-site/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
+# Set up permissions for non-root user
+RUN chown -R nginx:nginx /usr/share/nginx/html \
+    && chown -R nginx:nginx /var/cache/nginx \
+    && chown -R nginx:nginx /var/log/nginx \
+    && chown -R nginx:nginx /etc/nginx \
+    && touch /var/run/nginx.pid \
+    && chown nginx:nginx /var/run/nginx.pid \
+    && chmod 755 /tmp
+
 # Set default environment variables
 ENV OTEL_EXPORTER_OTLP_ENDPOINT="localhost:4317"
 ENV PORT="8080"
+
+# Switch to non-root user
+USER nginx
 
 EXPOSE ${PORT}
 ENTRYPOINT ["/docker-entrypoint.sh"]
