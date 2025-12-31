@@ -28,6 +28,7 @@ RUN chown -R nginx:nginx /usr/share/nginx/html \
 # Set default environment variables
 ENV OTEL_EXPORTER_OTLP_ENDPOINT="localhost:4317"
 ENV PORT="8080"
+ENV OTEL_SERVICE_NAME="personal-website"
 
 # Switch to non-root user
 USER nginx
