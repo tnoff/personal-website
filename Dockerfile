@@ -23,7 +23,7 @@ RUN chown -R nginx:nginx /usr/share/nginx/html \
     && chown -R nginx:nginx /etc/nginx \
     && touch /var/run/nginx.pid \
     && chown nginx:nginx /var/run/nginx.pid \
-    && chmod 755 /tmp
+    && chmod 1777 /tmp
 
 # Set default environment variables
 ENV OTEL_EXPORTER_OTLP_ENDPOINT="localhost:4317"
