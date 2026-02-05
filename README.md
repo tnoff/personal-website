@@ -115,9 +115,29 @@ docker run -p 9000:9000 \
 - **Static Site Generation**: Built with Hugo for fast, efficient static sites
 - **Bootstrap 5**: Responsive design with local Bootstrap assets
 - **Nginx**: Production-ready web server
-- **OpenTelemetry**: Full distributed tracing support
+- **OpenTelemetry**: Full distributed tracing support with client IP attribution
+- **Real Client IP**: Extracts real client IP from `X-Real-IP` header behind ingress
 - **Health Check**: `/_health/` endpoint for monitoring
 - **Docker**: Single-stage containerized deployment
+
+## Nginx Configuration
+
+### Real Client IP Forwarding
+
+When deployed behind an ingress controller (e.g., ingress-nginx), the real client IP is extracted from the `X-Real-IP` header. The configuration trusts requests from internal cluster networks:
+
+- `10.0.0.0/8` - Internal pod network
+- `10.244.0.0/16` - Kubernetes pod CIDR
+
+The real client IP is:
+- Used in access logs (`$remote_addr`)
+- Added to trace spans as `http.client_ip` attribute
+
+### OpenTelemetry Tracing
+
+Traces are exported via gRPC to the configured OTEL collector. Each request span includes:
+- Standard HTTP attributes (method, status, path)
+- `http.client_ip` - The real client IP address
 
 ## Deployment
 
