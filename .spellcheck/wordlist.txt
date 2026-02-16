@@ -58,3 +58,14 @@ Formatter
 SDK
 PagerDuty
 chatbots
+enablement
+CDKTF
+observability
+ECAM
+CloudWatch
+EKS
+OCI
+VPC
+SDKs
+CDK
+repo
