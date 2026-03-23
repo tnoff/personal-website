@@ -8,3 +8,6 @@ hugo-site/.hugo_build.lock
 
 # Local development
 .DS_Store
+
+# Rendercv outputs
+rendercv_output/

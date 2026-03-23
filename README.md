@@ -5,7 +5,8 @@ Tyler North's personal website built with Hugo and served via Nginx with OpenTel
 ## Prerequisites
 
 - [Hugo](https://gohugo.io/installation/) (v0.139.0 or later)
-- [Docker](https://docs.docker.com/get-docker/) (optional, for containerized deployment)
+- [Docker](https://docs.docker.com/get-docker/) (for containerized deployment and content generation)
+- [pre-commit](https://pre-commit.com/) (optional, for automatic content regeneration on commit)
 
 ## Local Development
 
@@ -88,25 +89,54 @@ docker run -p 9000:9000 \
   personal-website
 ```
 
+## Resume Content
+
+Resume, projects, and the PDF are all generated from a single source of truth:
+
+```
+Tyler_North_CV.yaml  →  generate.py  →  hugo-site/content/resume.html
+                                     →  hugo-site/content/projects.html
+                                     →  hugo-site/static/Tyler_Daniel_North_CV.pdf
+```
+
+**To regenerate content after editing the YAML:**
+```bash
+bash scripts/docker-generate.sh
+```
+
+**To keep generated files automatically in sync on every commit:**
+```bash
+pip install pre-commit
+pre-commit install
+# Now editing Tyler_North_CV.yaml and committing will auto-regenerate outputs
+```
+
+CI will fail if `Tyler_North_CV.yaml` is changed without regenerating the output files.
+
 ## Project Structure
 
 ```
 .
+├── Tyler_North_CV.yaml     # Single source of truth for resume/projects content
+├── generate.py             # Generates resume.html, projects.html, and PDF from YAML
+├── Dockerfile              # Production image (Hugo + Nginx)
+├── Dockerfile.generate     # Image used only for content generation (Python + rendercv)
+├── scripts/
+│   └── docker-generate.sh  # Builds Dockerfile.generate and runs generate.py
 ├── hugo-site/              # Hugo website root
-│   ├── content/            # Page content (HTML)
-│   │   ├── _index.html     # Homepage
-│   │   ├── resume.html     # Resume page
-│   │   └── projects.html   # Projects page
+│   ├── content/            # Page content (auto-generated, do not edit directly)
+│   │   ├── _index.html     # Homepage (manually maintained)
+│   │   ├── resume.html     # Generated from Tyler_North_CV.yaml
+│   │   └── projects.html   # Generated from Tyler_North_CV.yaml
 │   ├── layouts/            # Hugo templates
 │   │   ├── _default/
 │   │   │   ├── baseof.html # Base template
 │   │   │   └── single.html # Single page template
 │   │   └── index.html      # Homepage template
-│   ├── static/             # Static assets (CSS, JS, fonts)
+│   ├── static/             # Static assets (CSS, JS, fonts, generated PDF)
 │   ├── hugo.toml           # Hugo configuration
 │   ├── nginx.conf          # Nginx configuration
 │   └── docker-entrypoint.sh # Docker entrypoint script
-├── Dockerfile              # Multi-stage Docker build
 └── AGENTS.md               # AI agent development guide
 ```
 

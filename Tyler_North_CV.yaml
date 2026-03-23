@@ -1,0 +1,193 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/rendercv/rendercv/refs/tags/v2.8/schema.json
+cv:
+  name: Tyler Daniel North
+  headline:
+  location: Bay Area, California
+  email: me@tyler-north.com
+  photo:
+  phone: "+15108720165"
+  website:
+  social_networks:
+    - network: LinkedIn
+      username: tyler-n-89634344
+  custom_connections:
+  sections:
+    education:
+      - institution: San Francisco State University
+        area: Computer Science
+        degree: BS
+        date:
+        start_date: 2009-09
+        end_date: 2014-12
+        location: San Francisco, CA
+        summary:
+        highlights:
+          - Minor in Mathematics
+
+    experience:
+      - company: Groove.co/Clari
+        position: Staff Software Engineer (SRE)
+        date:
+        start_date: 2023-10
+        end_date: present
+        location: Bay Area, CA
+        summary:
+        highlights:
+          - Led observability (traces/logs/metrics) platform migration from New Relic, Datadog, and Sumo Logic to SignalFx and Splunk Cloud across 80+ services
+          - Integrated OpenTelemetry SDKs with Ruby, JavaScript, and Java applications
+          - Built service catalog with automated Kubernetes service syncing, entity validation, and cross-repo PR automation for service ownership; reduced drift between multiple infrastructure services and keeping org-wide systems in sync
+          - Designed standardized ECAM dashboards and detectors using CDK for Terraform across 80+ services
+          - Established on-call rotations with runbooks, PagerDuty escalation policies, and incident response processes
+          - Migrating Chef and Heroku applications over to EKS, including observability enablement across both environments during transition, saving roughly $700k a year
+
+      - company: Groove.co/Clari
+        position: Senior Site Reliability Engineer
+        date:
+        start_date: 2022-04
+        end_date: 2023-10
+        location: Bay Area, CA
+        summary:
+        highlights:
+          - Integrated multiple applications with OAuth2.0/SSO
+          - Migrated existing search endpoints to use AWS ElasticSearch/OpenSearch
+          - Imported existing company resources into Terraform, creating common modules for those resources
+          - Identified, monitored, and improved database latency performance for multiple transactions in Ruby on Rails
+
+      - company: Oracle Corporation
+        position: Senior Software Engineer (Technical Content/OpenSearch)
+        date:
+        start_date: 2019-06
+        end_date: 2022-04
+        location: Bay Area, CA
+        summary:
+        highlights:
+          - Led Operational Incidents Review board to improve overall operations posture
+          - Migrated multiple service environments to use Terraform configuration buildout on Cloud Environments
+          - Added support for non-English languages on Oracle Cloud documentation site
+          - Migrated majority of Oracle Cloud documentation from MadCap Flare to Oasis DITA formats
+
+      - company: Oracle Corporation
+        position: Software Engineer (Technical Content)
+        date:
+        start_date: 2018-11
+        end_date: 2019-06
+        location: Bay Area, CA
+        summary:
+        highlights:
+          - Designed, scaled, and operated a Content Deployment Pipeline for multiple different orgs and documentation structures
+          - Integrated multiple tools with Oracle's OAuth implementation to improve security
+          - Wrote tooling to keep multiple environments up to date with FedRamp patching requirements
+
+      - company: Oracle Corporation
+        position: Site Reliability Engineer (Object Storage)
+        date:
+        start_date: 2017-07
+        end_date: 2018-11
+        location: Bay Area, CA
+        summary:
+        highlights:
+          - Built, maintained, and supported several different Object Storage clusters with hundreds of nodes
+          - Developed and maintained best on-call practices/standards for all engineers
+          - Migrated multiple clusters from Layer 7 to Layer 4 Load Balancing solution to ensure higher throughput speeds with less management and configuration
+          - Maintained internal configuration and scripting for alarming, DNS, node provisioning, and code deployment
+
+      - company: Cisco Systems/Piston Cloud Computing
+        position: Software Engineer (Object Storage)
+        date:
+        start_date: 2015-06
+        end_date: 2017-03
+        location: Bay Area, CA
+        summary:
+        highlights:
+          - Designed and deployed both Object and Block Storage solutions for Cisco Cloud
+          - Maintained, built, and scaled Ceph storage clusters
+          - Designed and built Solidfire, NFS, and Pure Storage clusters
+
+      - company: Cisco Systems/Piston Cloud Computing
+        position: Customer Support Engineer
+        date:
+        start_date: 2010-12
+        end_date: 2015-06
+        location: Bay Area, CA
+        summary:
+        highlights:
+          - As a senior member of the customer success team, responsible for large scale customer OpenStack clusters providing Compute Instances, Authentication, Object Storage, and Block Storage
+          - Designed, developed, and maintained in-house On-Call paging application to improve incident response time and engineer on-call experience
+          - Troubleshot bugs with company software and upstream OpenStack software
+
+    projects:
+      - name: '[Discord Bot](https://github.com/tnoff/discord-bot)'
+        date:
+        start_date:
+        end_date:
+        location:
+        summary: A Discord bot framework written in Python with support for token authentication, YAML configuration, databases, and custom plugins
+        highlights:
+          - Audio playback from YouTube, Urban Dictionary lookup, Markov chain text generation, and role-based access control
+
+      - name: '[Enheduanna](https://github.com/tnoff/enheduanna)'
+        date:
+        start_date:
+        end_date:
+        location:
+        summary: Command-line utility for composing, structuring, and improving Markdown notes that monitors daily activities and documentation
+
+      - name: '[DapperTable](https://github.com/tnoff/dappertable)'
+        date:
+        start_date:
+        end_date:
+        location:
+        summary: Manages lengthy text outputs for chatbots by dividing content into smaller segments to work around API character limits while maintaining table formatting
+
+      - name: '[Hathor Podcast Manager](https://github.com/tnoff/hathor)'
+        date:
+        start_date:
+        end_date:
+        location:
+        summary: Download and manage media from RSS feeds and YouTube channels with SQLite database storage and customizable plugins
+
+      - name: '[Backup Tool](https://github.com/tnoff/backup-tool)'
+        date:
+        start_date:
+        end_date:
+        location:
+        summary: Encrypts and archives local files to Oracle Cloud Infrastructure Object Storage using AES encryption with password-protected keys
+
+      - name: '[Public Transit](https://github.com/tnoff/public-transit)'
+        date:
+        start_date:
+        end_date:
+        location:
+        summary: Retrieves arrival forecasts for AC Transit, BART, and SF-Muni with wrapper scripts for frequently accessed routes
+
+    skills:
+      - label: Languages
+        details: Python, Java, Ruby
+      - label: Frameworks
+        details: Django, Ruby on Rails
+      - label: IaC & Orchestration
+        details: Terraform, CDKTF, Kubernetes, Chef, GitHub Actions
+      - label: Observability
+        details: OpenTelemetry, SignalFx, Splunk Cloud, Datadog, New Relic
+      - label: Cloud
+        details: AWS (EKS, CloudWatch, VPC, ALB), OCI
+      - label: On-Call & Incident Management
+        details: PagerDuty, ECAM dashboards, KPI/SLA monitoring, incident escalation & review
+
+design:
+  theme: classic
+
+locale:
+  language: english
+
+settings:
+  current_date: today
+  render_command:
+    output_folder: rendercv_output
+    dont_generate_markdown: false
+    dont_generate_html: false
+    dont_generate_typst: false
+    dont_generate_pdf: false
+    dont_generate_png: false
+  bold_keywords: []
+  pdf_title: Tyler Daniel North - CV

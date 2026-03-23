@@ -20,6 +20,11 @@ docker build -t personal-website .
 docker run -p 8080:8080 personal-website
 ```
 
+**Regenerate resume/projects content from YAML:**
+```bash
+bash scripts/docker-generate.sh
+```
+
 ## Architecture Overview
 
 This is a Hugo static website served via Nginx with the following structure:
@@ -37,9 +42,11 @@ This is a Hugo static website served via Nginx with the following structure:
 - Enables HTML rendering in markdown
 
 **Content Structure:**
-- `content/_index.html` - Homepage with introduction and social links
-- `content/resume.html` - Resume page with work experience
-- `content/projects.html` - Projects page with descriptions
+- `content/_index.html` - Homepage with introduction and social links (manually maintained)
+- `content/resume.html` - Auto-generated from `Tyler_North_CV.yaml`, do not edit directly
+- `content/projects.html` - Auto-generated from `Tyler_North_CV.yaml`, do not edit directly
+
+To update resume or projects content, edit `Tyler_North_CV.yaml` and run `bash scripts/docker-generate.sh`.
 
 **Layouts:**
 - `layouts/_default/baseof.html` - Base template with Bootstrap 5, custom CSS, navbar, and footer
