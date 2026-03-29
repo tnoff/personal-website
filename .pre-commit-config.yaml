@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: generate-resume
+        name: Generate resume content from YAML
+        entry: bash scripts/docker-generate.sh
+        language: system
+        files: Tyler_North_CV.yaml
+        pass_filenames: false

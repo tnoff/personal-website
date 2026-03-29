@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  - pull_request
+
+jobs:
+  spellback:
+    name: Spellcheck
+    runs-on: ubuntu-24.04
+    steps:
+    # The checkout step
+    - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744
+    - uses: rojopolis/spellcheck-github-actions@ed0756273a1658136c36d26e3d0353de35b98c8b
+      name: Spellcheck
+      with:
+        config_path: .spellcheck/spellcheck.yml
+  docker:
+    name: Docker build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+    - name: Build image
+      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
+      with:
+        push: false
+
+  generate-check:
+    name: Resume content is up to date
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744
+    - name: Build generate image
+      run: docker build -f Dockerfile.generate -t tyler-north-generate .
+    - name: Run generate
+      run: docker run --rm -v "$PWD:/work" -w /work tyler-north-generate python generate.py
+    - name: Check generated files are up to date
+      run: git diff --exit-code hugo-site/content/resume.html hugo-site/content/projects.html hugo-site/static/Tyler_Daniel_North_CV.pdf
