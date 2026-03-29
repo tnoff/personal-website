@@ -62,7 +62,7 @@ To update resume or projects content, edit `Tyler_North_CV.yaml` and run `bash s
 ### Production Deployment
 
 **Docker:**
-- Single-stage build using `nginx:1.27-alpine`
+- Single-stage build using `nginx:1.29.6-alpine-otel`
 - Hugo installed from Alpine packages (v0.139.0)
 - Site built during image creation
 - Final image serves static files via Nginx (~103 MiB)
