@@ -149,11 +149,27 @@ def main():
     if result.returncode != 0:
         print(f"rendercv failed:\n{result.stderr}", file=sys.stderr)
         sys.exit(1)
-    print("rendercv completed")
+    print("rendercv completed (with phone, for repo)")
 
-    PDF_DST.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(PDF_SRC, PDF_DST)
-    print(f"Copied PDF to {PDF_DST}")
+    # Generate a phone-free PDF for the website
+    import tempfile
+    with open(YAML_FILE) as f:
+        cv_data = yaml.safe_load(f)
+    cv_data["cv"].pop("phone", None)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_yaml = Path(tmpdir) / YAML_FILE.name
+        tmp_yaml.write_text(yaml.dump(cv_data, allow_unicode=True))
+        result2 = subprocess.run(
+            ["rendercv", "render", str(tmp_yaml), "--output-folder", tmpdir],
+            capture_output=True, text=True,
+        )
+        if result2.returncode != 0:
+            print(f"rendercv (no-phone) failed:\n{result2.stderr}", file=sys.stderr)
+            sys.exit(1)
+        print("rendercv completed (without phone, for website)")
+        PDF_DST.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(Path(tmpdir) / PDF_SRC.name, PDF_DST)
+        print(f"Copied phone-free PDF to {PDF_DST}")
 
 
 if __name__ == "__main__":
