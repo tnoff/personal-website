@@ -30,8 +30,26 @@ jobs:
       with:
         push: false
 
+  changes:
+    name: Detect file changes
+    runs-on: ubuntu-24.04
+    outputs:
+      resume: ${{ steps.filter.outputs.resume }}
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+    - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d
+      id: filter
+      with:
+        filters: |
+          resume:
+            - 'Tyler_North_CV.yaml'
+            - 'generate.py'
+            - 'Dockerfile.generate'
+
   generate-check:
     name: Resume content is up to date
+    needs: changes
+    if: ${{ needs.changes.outputs.resume == 'true' }}
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -40,4 +58,4 @@ jobs:
     - name: Run generate
       run: docker run --rm -v "$PWD:/work" -w /work tyler-north-generate python generate.py
     - name: Check generated files are up to date
-      run: git diff --exit-code hugo-site/content/resume.html hugo-site/content/projects.html hugo-site/static/Tyler_Daniel_North_CV.pdf
+      run: git diff --exit-code hugo-site/content/resume.html hugo-site/content/projects.html
