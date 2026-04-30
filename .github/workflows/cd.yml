@@ -9,7 +9,7 @@ jobs:
   tag_build:
     permissions:
       contents: write
-    uses: tnoff/github-workflows/.github/workflows/tag.yml@5c01c5cfcd5237914aee049f8b681b1a0b6215cc
+    uses: tnoff/github-workflows/.github/workflows/tag.yml@06f676738efdf3f327af0059b3ce0c6f187e1b5c
     with:
       version_file: ./VERSION
   check_labels:
