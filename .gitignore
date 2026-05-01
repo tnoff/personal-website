@@ -1,0 +1,13 @@
+# Hugo
+hugo-site/public/
+hugo-site/resources/
+hugo-site/.hugo_build.lock
+
+# Editor
+*.swp
+
+# Local development
+.DS_Store
+
+# Rendercv outputs
+rendercv_output/

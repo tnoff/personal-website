@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>tyler-north.com</title>
+
+        <!-- Bootstrap CSS -->
+        <link href="/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Bootstrap Icons -->
+        <link rel="stylesheet" href="/css/bootstrap-icons.min.css">
+
+        <!-- Custom CSS Styles -->
+        <style type="text/css">
+            body {
+                background-color: #c7cbcc;
+                font-family: Garamond, serif;
+            }
+            a {
+                color: #083a87;
+                background-color: transparent;
+            }
+            p {
+                font-size: 20px;
+                color: #141616;
+            }
+            li {
+                font-size: 20px;
+                color: #141616;
+            }
+            footer {
+                padding-top: 20px;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                text-align: center;
+            }
+            .header {
+                padding-top: 15px;
+                color: #141616;
+            }
+            .nav-item {
+                font-family: Garamond, serif;
+                color: #141616;
+            }
+            .nav-link {
+                text-decoration: underline;
+            }
+            @media (max-width: 768px) {
+                p, li {
+                    font-size: 16px;
+                }
+                .nav-link {
+                    font-size: 1.1rem !important;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <nav class="navbar">
+            <div class="navbar-nav mx-auto d-flex flex-row gap-3">
+                <a class="nav-link fs-4" href="/">Homepage</a>
+                <a class="nav-link fs-4" href="/resume">Resume</a>
+                <a class="nav-link fs-4" href="/projects">Projects</a>
+            </div>
+        </nav>
+
+        <!-- Main content block -->
+        <div class="container">
+        {{ block "main" . }}{{ end }}
+        </div>
+
+        <footer>
+            <p>Author: Tyler North. Last updated 2026.</p>
+        </footer>
+
+        <!-- Bootstrap JavaScript -->
+        <script src="/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

@@ -1,0 +1,10 @@
+baseURL = 'https://tyler-north.com'
+languageCode = 'en-us'
+title = 'tyler-north.com'
+
+# Disable taxonomy pages (tags, categories, etc.) since we don't use them
+disableKinds = ['taxonomy', 'term']
+
+# Enable HTML files in content directory
+[markup.goldmark.renderer]
+unsafe = true
