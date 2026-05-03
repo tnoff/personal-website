@@ -2,5 +2,13 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "enabledManagers": ["pre-commit", "dockerfile", "gitlabci"],
-  "labels": ["dependencies"]
+  "labels": ["dependencies"],
+  "rebaseWhen": "behind-base-branch",
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["patch"],
+      "additionalBranchPrefix": "dev-",
+      "automerge": true
+    }
+  ]
 }
