@@ -37,9 +37,9 @@ bump-version:
 
 pre-commit:
   stage: validate
-  image: docker.io/library/docker:27
+  image: docker.io/library/docker:29
   services:
-    - docker.io/library/docker:27-dind
+    - docker.io/library/docker:29-dind
   variables:
     GIT_DEPTH: "0"
   before_script:
