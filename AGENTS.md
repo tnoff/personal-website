@@ -1,73 +1,78 @@
 # AGENTS.md
 
-This file provides guidance to AI coding agents when working with code in this repository.
+Guidance for AI coding agents working in this repository. For an
+overview of the site and how to build/run it see [README.md](README.md);
+for dev server, content regeneration, and CI see [DEVELOPMENT.md](DEVELOPMENT.md).
 
-## Development Commands
+## What this repo is
 
-**Start development server:**
-```bash
-cd hugo-site && hugo server --bind 0.0.0.0
+A Hugo static site served by nginx. Resume and projects pages are
+generated from a single YAML CV; everything else is hand-authored
+markdown/HTML.
+
+```
+.
+├── Tyler_North_CV.yaml          # Single source of truth for resume + projects
+├── generate.py                  # Renders YAML → Hugo content + RenderCV PDF
+├── hugo-site/
+│   ├── hugo.toml                # baseURL, taxonomy disabled, HTML in MD
+│   ├── content/
+│   │   ├── _index.html          # Homepage — hand-authored
+│   │   ├── resume.html          # GENERATED — do not edit
+│   │   └── projects.html        # GENERATED — do not edit
+│   ├── layouts/                 # Bootstrap 5 templates
+│   ├── static/                  # Static assets + the generated PDF
+│   └── nginx.conf               # Serves :8080, /_health/ liveness, gzip + headers
+├── scripts/docker-generate.sh   # Wrapper that runs generate.py in Docker
+├── Dockerfile                   # nginx:alpine + Hugo build
+└── Dockerfile.generate          # Used by scripts/docker-generate.sh
 ```
 
-**Build static site:**
-```bash
-cd hugo-site && hugo --minify
-```
+## Non-obvious internals
 
-**Run in Docker:**
-```bash
-docker build -t personal-website .
-docker run -p 8080:8080 personal-website
-```
+### `resume.html` and `projects.html` are generated — never hand-edit
 
-**Regenerate resume/projects content from YAML:**
-```bash
-bash scripts/docker-generate.sh
-```
+`generate.py` reads `Tyler_North_CV.yaml` and overwrites
+`hugo-site/content/resume.html` and `projects.html` on every run. A
+hand-edit there will be wiped the next time `scripts/docker-generate.sh`
+runs. To change resume content, edit the YAML and re-run the script.
 
-## Architecture Overview
+### `rendercv_output/` flows into the site
 
-This is a Hugo static website served via Nginx with the following structure:
+`generate.py` also copies `rendercv_output/Tyler_Daniel_North_CV.pdf`
+to `hugo-site/static/Tyler_Daniel_North_CV.pdf` so the homepage's PDF
+link points at the latest render. The `rendercv_output/` directory is
+the canonical artifact location — don't move it without updating the
+constants at the top of `generate.py`.
 
-- **Hugo site:** `hugo-site/` - Contains all Hugo configuration and content
-- **Content:** `hugo-site/content/` - HTML pages for the site
-- **Layouts:** `hugo-site/layouts/` - Hugo templates using Bootstrap 5
-- **Static files:** Served directly from generated `public/` directory
+### Nginx listens on 8080 (not 80)
 
-### Key Components
+The image runs nginx as the non-root `nginx` user, which cannot bind
+80. `hugo-site/nginx.conf` listens on 8080; the Kubernetes Service
+forwards 80 → 8080. If you change the port, also update the Service
+manifest in `tnoff-projects/docker-apps` and the
+`HEALTHCHECK` in the Dockerfile.
 
-**Hugo Configuration (`hugo-site/hugo.toml`):**
-- BaseURL set to https://tyler-north.com
-- Disables unused taxonomy features
-- Enables HTML rendering in markdown
+### `/_health/` is the readiness/liveness probe
 
-**Content Structure:**
-- `content/_index.html` - Homepage with introduction and social links (manually maintained)
-- `content/resume.html` - Auto-generated from `Tyler_North_CV.yaml`, do not edit directly
-- `content/projects.html` - Auto-generated from `Tyler_North_CV.yaml`, do not edit directly
+`hugo-site/nginx.conf` defines `/_health/` returning `200 OK`. The
+Kubernetes manifests in `docker-apps` reference this path. Don't rename
+it without updating both.
 
-To update resume or projects content, edit `Tyler_North_CV.yaml` and run `bash scripts/docker-generate.sh`.
+### Hugo version pinning is via the Alpine package
 
-**Layouts:**
-- `layouts/_default/baseof.html` - Base template with Bootstrap 5, custom CSS, navbar, and footer
-- `layouts/_default/single.html` - Single page layout
-- `layouts/index.html` - Homepage layout
+The Dockerfile installs Hugo via `apk add --no-cache hugo`, which pulls
+whatever version Alpine has for the base image's release. Major Hugo
+upgrades occasionally break theme/template syntax — when bumping the
+nginx base image (which usually means a new Alpine version), build
+locally first and check the rendered output.
 
-**Nginx Configuration (`hugo-site/nginx.conf`):**
-- Listens on port 8080
-- Health check endpoint at `/_health/`
-- Gzip compression enabled
-- Security headers configured
+## Conventions
 
-### Production Deployment
-
-**Docker:**
-- Single-stage build using `nginx:1.27-alpine`
-- Hugo installed from Alpine packages (v0.139.0)
-- Site built during image creation
-- Final image serves static files via Nginx (~103 MiB)
-
-**Kubernetes:**
-- Deploy via standard K8s deployment
-- Service exposes port 8080
-- Health checks use `/_health/` endpoint
+- **Bootstrap 5** for layout. Add new components as Hugo partials, not
+  inline `<style>` blocks.
+- **Auto-generated files carry no warning header** — there is no
+  `<!-- DO NOT EDIT -->` banner in `resume.html` / `projects.html`. The
+  fact that they're generated is documented here. If you're unsure
+  whether a content file is generated, `grep` `generate.py` for its
+  filename.
