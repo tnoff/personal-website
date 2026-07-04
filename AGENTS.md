@@ -6,20 +6,19 @@ for dev server, content regeneration, and CI see [DEVELOPMENT.md](DEVELOPMENT.md
 
 ## What this repo is
 
-A Hugo static site served by nginx. Resume and projects pages are
-generated from a single YAML CV; everything else is hand-authored
-markdown/HTML.
+A Hugo static site served by nginx. The resume page is generated from a
+single YAML CV; everything else is hand-authored markdown/HTML.
 
 ```
 .
-├── Tyler_North_CV.yaml          # Single source of truth for resume + projects
-├── generate.py                  # Renders YAML → Hugo content + RenderCV PDF
+├── Tyler_North_CV.yaml          # Single source of truth for the resume page + PDF
+├── generate.py                  # Renders YAML → resume.html + RenderCV PDF
 ├── hugo-site/
 │   ├── hugo.toml                # baseURL, taxonomy disabled, HTML in MD
 │   ├── content/
 │   │   ├── _index.html          # Homepage — hand-authored
 │   │   ├── resume.html          # GENERATED — do not edit
-│   │   └── projects.html        # GENERATED — do not edit
+│   │   └── projects.html        # Hand-authored
 │   ├── layouts/                 # Bootstrap 5 templates
 │   ├── static/                  # Static assets + the generated PDF
 │   └── nginx.conf               # Serves :8080, /_health/ liveness, gzip + headers
@@ -30,12 +29,13 @@ markdown/HTML.
 
 ## Non-obvious internals
 
-### `resume.html` and `projects.html` are generated — never hand-edit
+### `resume.html` is generated — never hand-edit
 
 `generate.py` reads `Tyler_North_CV.yaml` and overwrites
-`hugo-site/content/resume.html` and `projects.html` on every run. A
-hand-edit there will be wiped the next time `scripts/docker-generate.sh`
-runs. To change resume content, edit the YAML and re-run the script.
+`hugo-site/content/resume.html` on every run. A hand-edit there will be
+wiped the next time `scripts/docker-generate.sh` runs. To change resume
+content, edit the YAML and re-run the script. `projects.html` is *not*
+generated — it is hand-authored and edited directly.
 
 ### `rendercv_output/` flows into the site
 
@@ -71,8 +71,9 @@ locally first and check the rendered output.
 
 - **Bootstrap 5** for layout. Add new components as Hugo partials, not
   inline `<style>` blocks.
-- **Auto-generated files carry no warning header** — there is no
-  `<!-- DO NOT EDIT -->` banner in `resume.html` / `projects.html`. The
-  fact that they're generated is documented here. If you're unsure
-  whether a content file is generated, `grep` `generate.py` for its
+- **Generated files carry a warning header** — `resume.html` starts with
+  an `<!-- AUTO-GENERATED from Tyler_North_CV.yaml — do not edit
+  directly -->` banner written by `generate.py`. `projects.html` has no
+  banner because it is hand-authored. If you're unsure whether a content
+  file is generated, check for the banner or `grep` `generate.py` for its
   filename.

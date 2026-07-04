@@ -70,3 +70,5 @@ SDKs
 CDK
 repo
 customizable
+PayPal
+Venmo

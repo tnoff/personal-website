@@ -33,11 +33,12 @@ hugo server --bind 0.0.0.0
 
 Default Hugo listen port: 1313.
 
-## Regenerating resume / projects content
+## Regenerating resume content
 
-`hugo-site/content/resume.html` and `hugo-site/content/projects.html`
-are **generated** from [`Tyler_North_CV.yaml`](Tyler_North_CV.yaml).
-Don't edit them by hand — `generate.py` overwrites them.
+`hugo-site/content/resume.html` is **generated** from
+[`Tyler_North_CV.yaml`](Tyler_North_CV.yaml). Don't edit it by hand —
+`generate.py` overwrites it. (`hugo-site/content/projects.html` is
+hand-authored, not generated.)
 
 To regenerate after editing the YAML:
 

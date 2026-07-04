@@ -9,6 +9,8 @@ cv:
   social_networks:
     - network: LinkedIn
       username: tyler-n-89634344
+    - network: GitHub
+      username: tnoff
   custom_connections:
   sections:
     education:
@@ -24,11 +26,18 @@ cv:
           - Minor in Mathematics
 
     experience:
+      - company: PayPal/Venmo
+        position: Staff Software Engineer (Infrastructure)
+        date:
+        start_date: 2026-06
+        end_date: present
+        location: Bay Area, CA
+        summary:
       - company: Groove.co/Clari
         position: Staff Software Engineer (SRE)
         date:
         start_date: 2023-10
-        end_date: present
+        end_date: 2026-06
         location: Bay Area, CA
         summary:
         highlights:
@@ -135,7 +144,12 @@ locale:
   language: english
 
 settings:
-  current_date: today
+  # Pinned (not `today`) so the rendered PDF is byte-reproducible: rendercv
+  # stamps this date into the PDF metadata (CreationDate/ModDate) and the
+  # "last updated" footer, so `today` made every regeneration differ and broke
+  # the generate-resume CI check daily. Bump to the current date whenever the
+  # CV content is meaningfully updated.
+  current_date: "2026-07-03"
   render_command:
     output_folder: rendercv_output
     dont_generate_markdown: false

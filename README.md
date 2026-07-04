@@ -91,13 +91,15 @@ docker run -p 9000:9000 \
 
 ## Resume Content
 
-Resume, projects, and the PDF are all generated from a single source of truth:
+The resume page and the PDF are generated from a single source of truth:
 
 ```
 Tyler_North_CV.yaml  →  generate.py  →  hugo-site/content/resume.html
-                                     →  hugo-site/content/projects.html
                                      →  hugo-site/static/Tyler_Daniel_North_CV.pdf
 ```
+
+`hugo-site/content/projects.html` is **not** generated — it is
+hand-authored and edited directly.
 
 **To regenerate content after editing the YAML:**
 ```bash
@@ -118,16 +120,16 @@ CI will fail if `Tyler_North_CV.yaml` is changed without regenerating the output
 ```
 .
 ├── Tyler_North_CV.yaml     # Single source of truth for resume/projects content
-├── generate.py             # Generates resume.html, projects.html, and PDF from YAML
+├── generate.py             # Generates resume.html and PDF from YAML
 ├── Dockerfile              # Production image (Hugo + Nginx)
 ├── Dockerfile.generate     # Image used only for content generation (Python + rendercv)
 ├── scripts/
 │   └── docker-generate.sh  # Builds Dockerfile.generate and runs generate.py
 ├── hugo-site/              # Hugo website root
-│   ├── content/            # Page content (auto-generated, do not edit directly)
-│   │   ├── _index.html     # Homepage (manually maintained)
-│   │   ├── resume.html     # Generated from Tyler_North_CV.yaml
-│   │   └── projects.html   # Generated from Tyler_North_CV.yaml
+│   ├── content/            # Page content
+│   │   ├── _index.html     # Homepage (hand-authored)
+│   │   ├── resume.html     # Generated from Tyler_North_CV.yaml — do not edit directly
+│   │   └── projects.html   # Hand-authored
 │   ├── layouts/            # Hugo templates
 │   │   ├── _default/
 │   │   │   ├── baseof.html # Base template

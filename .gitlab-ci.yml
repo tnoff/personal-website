@@ -71,13 +71,14 @@ bump-version:
 
 pre-commit:
   stage: validate
-  image: docker.io/library/docker:29
-  services:
-    - docker.io/library/docker:29-dind
+  # ci-pre-commit ships git + pre-commit + rendercv[full] + pyyaml on
+  # python:3.14-slim. The generate-resume hook regenerates from
+  # Tyler_North_CV.yaml via scripts/docker-generate.sh, which falls back to
+  # running generate.py directly when Docker is absent (it is here) — the
+  # image's baked-in rendercv/pyyaml back that native path, so no dind.
+  image: iad.ocir.io/tnoff/ci-pre-commit:latest
   variables:
     GIT_DEPTH: "0"
-  before_script:
-    - apk add --no-cache git bash pre-commit
   script:
     - pre-commit run --from-ref "$CI_MERGE_REQUEST_DIFF_BASE_SHA" --to-ref HEAD
   rules:
