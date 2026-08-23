@@ -5,6 +5,12 @@ All notable changes to the personal website will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.6] - 2026-08-23
+
+### Changed
+
+- Requests to `/_health/` are no longer traced. The endpoint is called by the kubelet's readiness and liveness probes and by nothing else, so every trace the site produced was a probe landing as its own single-span trace. Page views are traced exactly as before.
+
 ## [0.0.5] - 2026-07-21
 
 ### Changed
