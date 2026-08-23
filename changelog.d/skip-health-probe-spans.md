@@ -1,0 +1,1 @@
+Requests to `/_health/` are no longer traced. The endpoint is called by the kubelet's readiness and liveness probes and by nothing else, so every trace the site produced was a probe landing as its own single-span trace. Page views are traced exactly as before.

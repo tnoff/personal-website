@@ -59,6 +59,16 @@ manifest in `tnoff-projects/docker-apps` and the
 Kubernetes manifests in `docker-apps` reference this path. Don't rename
 it without updating both.
 
+That location carries `access_log off;` **and** `otel_trace off;`. Both
+are deliberate: the kubelet probes it every few seconds and nothing else
+calls it — measured 2026-08-22 at 0.28 spans/s against 0.0006 spans/s of
+real page views — so tracing it meant the site's entire span output was
+probes, each landing in Tempo as its own single-span trace.
+
+`otel_trace on` is set in the `http` block and inherited by every
+location, so turning it off has to be explicit here. If you add another
+probe-only or machine-only location, turn it off there too.
+
 ### Hugo version pinning is via the Alpine package
 
 The Dockerfile installs Hugo via `apk add --no-cache hugo`, which pulls
