@@ -15,7 +15,7 @@ permissions:
 jobs:
   secrets:
     name: Scan for secrets
-    uses: tnoff/github-workflows/.github/workflows/trufflehog.yml@7211258c07503e00971c91988027b4f907ffe5b4
+    uses: tnoff/github-workflows/.github/workflows/trufflehog.yml@f064a9ce541cc052d9a2c9036bde578aede7b7d1
 
   # Diff-scoped, not --all-files, and that is a correctness choice rather than a
   # speed one. The generate-resume hook is `pass_filenames: false` with
@@ -35,13 +35,13 @@ jobs:
   # fetch_depth stays at the workflow default of 0; the diff needs the base.
   pre-commit:
     name: pre-commit
-    uses: tnoff/github-workflows/.github/workflows/pre-commit.yml@7211258c07503e00971c91988027b4f907ffe5b4
+    uses: tnoff/github-workflows/.github/workflows/pre-commit.yml@f064a9ce541cc052d9a2c9036bde578aede7b7d1
     with:
       all_files: false
 
   spellcheck:
     name: Spellcheck
-    uses: tnoff/github-workflows/.github/workflows/spellcheck.yml@7211258c07503e00971c91988027b4f907ffe5b4
+    uses: tnoff/github-workflows/.github/workflows/spellcheck.yml@f064a9ce541cc052d9a2c9036bde578aede7b7d1
     with:
       name: html
 
@@ -94,14 +94,14 @@ jobs:
     name: Build and scan image
     needs: changes
     if: needs.changes.outputs.image == 'true'
-    uses: tnoff/github-workflows/.github/workflows/docker-build-check.yml@7211258c07503e00971c91988027b4f907ffe5b4
+    uses: tnoff/github-workflows/.github/workflows/docker-build-check.yml@f064a9ce541cc052d9a2c9036bde578aede7b7d1
 
   bump-version:
     name: Bump version
     if: startsWith(github.head_ref, 'renovate/dev-')
     permissions:
       contents: write
-    uses: tnoff/github-workflows/.github/workflows/bump-version.yml@7211258c07503e00971c91988027b4f907ffe5b4
+    uses: tnoff/github-workflows/.github/workflows/bump-version.yml@f064a9ce541cc052d9a2c9036bde578aede7b7d1
     with:
       bump_changelog: true
     secrets:
@@ -112,7 +112,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    uses: tnoff/github-workflows/.github/workflows/renovate-auto-approve.yml@7211258c07503e00971c91988027b4f907ffe5b4
+    uses: tnoff/github-workflows/.github/workflows/renovate-auto-approve.yml@f064a9ce541cc052d9a2c9036bde578aede7b7d1
     with:
       branch_pattern: '^renovate/'
     secrets:
