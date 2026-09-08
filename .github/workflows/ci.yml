@@ -15,7 +15,7 @@ permissions:
 jobs:
   secrets:
     name: Scan for secrets
-    uses: tnoff/github-workflows/.github/workflows/trufflehog.yml@badea054ae56c6ca72252cd22dab3a9f9b65268f
+    uses: tnoff/github-workflows/.github/workflows/trufflehog.yml@2c7a6597fce4072fb2755f49742147e7482e6065
 
   # Diff-scoped, not --all-files, and that is a correctness choice rather than a
   # speed one. The generate-resume hook is `pass_filenames: false` with
@@ -35,13 +35,13 @@ jobs:
   # fetch_depth stays at the workflow default of 0; the diff needs the base.
   pre-commit:
     name: pre-commit
-    uses: tnoff/github-workflows/.github/workflows/pre-commit.yml@badea054ae56c6ca72252cd22dab3a9f9b65268f
+    uses: tnoff/github-workflows/.github/workflows/pre-commit.yml@2c7a6597fce4072fb2755f49742147e7482e6065
     with:
       all_files: false
 
   spellcheck:
     name: Spellcheck
-    uses: tnoff/github-workflows/.github/workflows/spellcheck.yml@badea054ae56c6ca72252cd22dab3a9f9b65268f
+    uses: tnoff/github-workflows/.github/workflows/spellcheck.yml@2c7a6597fce4072fb2755f49742147e7482e6065
     with:
       name: html
 
@@ -94,14 +94,14 @@ jobs:
     name: Build and scan image
     needs: changes
     if: needs.changes.outputs.image == 'true'
-    uses: tnoff/github-workflows/.github/workflows/docker-build-check.yml@badea054ae56c6ca72252cd22dab3a9f9b65268f
+    uses: tnoff/github-workflows/.github/workflows/docker-build-check.yml@2c7a6597fce4072fb2755f49742147e7482e6065
 
   bump-version:
     name: Bump version
     if: startsWith(github.head_ref, 'renovate/dev-')
     permissions:
       contents: write
-    uses: tnoff/github-workflows/.github/workflows/bump-version.yml@badea054ae56c6ca72252cd22dab3a9f9b65268f
+    uses: tnoff/github-workflows/.github/workflows/bump-version.yml@2c7a6597fce4072fb2755f49742147e7482e6065
     with:
       bump_changelog: true
     secrets:
