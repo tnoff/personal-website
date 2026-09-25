@@ -1,7 +1,7 @@
 # Development
 
 Local dev, content regeneration, build, and CI for this site. User-facing
-docs (what the site is) live in [README.md](README.md); for non-obvious
+docs (what the site is) live in [README.md](../README.md); for non-obvious
 internals see [AGENTS.md](AGENTS.md).
 
 ## Prerequisites
@@ -18,11 +18,14 @@ Optional virtualenv for the Python generator:
 ```bash
 virtualenv venv
 source venv/bin/activate
-pip install pyyaml
+pip install "rendercv[full]" pyyaml
 ```
 
-`generate.py` is the only Python entry point; it has a single
-runtime dep (`pyyaml`).
+`generate.py` is the only Python entry point; it has two runtime deps --
+`pyyaml` to parse the CV, and the `rendercv` CLI (shelled out to via
+`subprocess.run`) to produce the PDF. Missing `rendercv` fails only at
+that step, after `resume.html` has already been (re)written, so the
+failure can look partial.
 
 ## Local dev server
 
@@ -36,7 +39,7 @@ Default Hugo listen port: 1313.
 ## Regenerating resume content
 
 `hugo-site/content/resume.html` is **generated** from
-[`Tyler_North_CV.yaml`](Tyler_North_CV.yaml). Don't edit it by hand —
+[`Tyler_North_CV.yaml`](../Tyler_North_CV.yaml). Don't edit it by hand —
 `generate.py` overwrites it. (`hugo-site/content/projects.html` is
 hand-authored, not generated.)
 
@@ -71,11 +74,13 @@ The image is `nginx:alpine` serving the static output from
 
 ## CI / release
 
-CI is GitLab CI pulling shared templates from
-`tnoff-projects/github-workflows`. The image is built and pushed via
-`buildkit-docker-push.yml`; the SHA pin in
+CI is GitHub Actions pulling shared templates from
+`tnoff/github-workflows`. The image is built and pushed via
+`docker-push.yml`; the SHA pin in
 [`tnoff-projects/docker-apps`](https://gitlab.com/tnoff-projects/docker-apps)
-is bumped automatically by `trigger-bump.yml`.
+is bumped automatically by `trigger-bump-dispatch.yml`.
 
 `VERSION` at the repo root is the single source of truth for tagging.
-Bump it and push to `main` — CI handles tagging and the release.
+Bump it and push to `main` — CI handles tagging and the image push. There
+is no GitHub Release object created (`release.yml`'s own comment says so
+explicitly).

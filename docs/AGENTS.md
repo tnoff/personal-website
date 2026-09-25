@@ -1,7 +1,7 @@
 # AGENTS.md
 
 Guidance for AI coding agents working in this repository. For an
-overview of the site and how to build/run it see [README.md](README.md);
+overview of the site and how to build/run it see [README.md](../README.md);
 for dev server, content regeneration, and CI see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## What this repo is

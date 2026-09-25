@@ -139,7 +139,12 @@ CI will fail if `Tyler_North_CV.yaml` is changed without regenerating the output
 │   ├── hugo.toml           # Hugo configuration
 │   ├── nginx.conf          # Nginx configuration
 │   └── docker-entrypoint.sh # Docker entrypoint script
-└── AGENTS.md               # AI agent development guide
+├── mkdocs.yml              # Backstage TechDocs site config
+└── docs/
+    ├── README.md           # Symlink to ../README.md (single copy for GitHub + TechDocs)
+    ├── DEVELOPMENT.md      # Local dev, content regen, CI
+    ├── AGENTS.md           # AI agent development guide
+    └── CONTRIBUTING.md     # Canonical-remote statement
 ```
 
 ## Features
@@ -184,7 +189,7 @@ The site is designed to be deployed via Docker on Kubernetes:
 
 - `PORT` - Port for Nginx to listen on (default: `8080`)
 - `OTEL_EXPORTER_OTLP_ENDPOINT` - OpenTelemetry collector endpoint (default: `localhost:4317`)
-- `OTEL_SERVICE_NAME` - Service name for OpenTelemetry traces (required for proper trace identification)
+- `OTEL_SERVICE_NAME` - Service name for OpenTelemetry traces (default: `personal-website`)
 
 Example Kubernetes deployment snippet:
 ```yaml
