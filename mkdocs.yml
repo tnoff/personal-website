@@ -1,0 +1,11 @@
+site_name: 'personal-website'
+site_description: 'Hugo static site for tyler-north.com, served by nginx with OpenTelemetry instrumentation'
+
+nav:
+  - Home: README.md
+  - Development: DEVELOPMENT.md
+  - Agents/Conventions: AGENTS.md
+  - Contributing: CONTRIBUTING.md
+
+plugins:
+  - techdocs-core
