@@ -3,7 +3,7 @@
 
 import html
 import shutil
-import subprocess
+import subprocess  # nosec B404
 import sys
 from pathlib import Path
 
@@ -102,7 +102,10 @@ def main():
     RESUME_OUT.write_text(generate_resume(cv))
     print(f"Written {RESUME_OUT}")
 
-    result = subprocess.run(
+    # Fixed argv list, shell=False (default), no untrusted input; rendercv
+    # resolved via PATH intentionally, same as everything else this script
+    # shells out to.
+    result = subprocess.run(  # nosec
         ["rendercv", "render", str(YAML_FILE), "--output-folder", "rendercv_output"],
         capture_output=True, text=True,
     )
