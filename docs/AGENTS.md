@@ -1,7 +1,7 @@
 # AGENTS.md
 
 Guidance for AI coding agents working in this repository. For an
-overview of the site and how to build/run it see [README.md](../README.md);
+overview of the site and how to build/run it see [README.md](README.md);
 for dev server, content regeneration, and CI see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## What this repo is
@@ -19,12 +19,16 @@ single YAML CV; everything else is hand-authored markdown/HTML.
 │   │   ├── _index.html          # Homepage — hand-authored
 │   │   ├── resume.html          # GENERATED — do not edit
 │   │   └── projects.html        # Hand-authored
-│   ├── layouts/                 # Bootstrap 5 templates
+│   ├── layouts/                 # Bootstrap 5 templates (_default/baseof, single; index)
 │   ├── static/                  # Static assets + the generated PDF
-│   └── nginx.conf               # Serves :8080, /_health/ liveness, gzip + headers
+│   ├── nginx.conf               # Serves :${PORT}, /_health/ liveness, gzip + headers
+│   └── docker-entrypoint.sh     # envsubst into nginx.conf, then starts nginx
 ├── scripts/docker-generate.sh   # Wrapper that runs generate.py in Docker
-├── Dockerfile                   # nginx:alpine + Hugo build
-└── Dockerfile.generate          # Used by scripts/docker-generate.sh
+├── Dockerfile                   # nginx (otel build, alpine) + Hugo build
+├── Dockerfile.generate          # Used by scripts/docker-generate.sh
+├── mkdocs.yml                   # Backstage TechDocs site config
+└── docs/                        # README.md is a symlink to ../README.md;
+                                 # DEVELOPMENT / AGENTS / CONTRIBUTING are real files
 ```
 
 ## Non-obvious internals
@@ -48,10 +52,9 @@ constants at the top of `generate.py`.
 ### Nginx listens on 8080 (not 80)
 
 The image runs nginx as the non-root `nginx` user, which cannot bind
-80. `hugo-site/nginx.conf` listens on 8080; the Kubernetes Service
-forwards 80 → 8080. If you change the port, also update the Service
-manifest in `tnoff-projects/docker-apps` and the
-`HEALTHCHECK` in the Dockerfile.
+80. `hugo-site/nginx.conf` listens on `${PORT}` (default 8080). If you
+change the port, also update the Deployment, Service and NetworkPolicy in
+`tnoff/docker-apps/apps/personal-website`.
 
 ### `/_health/` is the readiness/liveness probe
 

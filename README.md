@@ -1,206 +1,53 @@
 # personal-website
 
-Tyler North's personal website built with Hugo and served via Nginx with OpenTelemetry instrumentation.
+Tyler North's personal website ([tyler-north.com](https://tyler-north.com)),
+built with Hugo and served by nginx with OpenTelemetry instrumentation.
+Runs on OKE; GitHub Actions builds the image and `tnoff/docker-apps` deploys it.
 
-## Prerequisites
-
-- [Hugo](https://gohugo.io/installation/) (v0.139.0 or later)
-- [Docker](https://docs.docker.com/get-docker/) (for containerized deployment and content generation)
-- [pre-commit](https://pre-commit.com/) (optional, for automatic content regeneration on commit)
-
-## Local Development
-
-### Install Hugo
-
-**macOS:**
-```bash
-brew install hugo
-```
-
-**Linux:**
-```bash
-# Download and install Hugo extended
-wget https://github.com/gohugoio/hugo/releases/download/v0.139.0/hugo_extended_0.139.0_linux-amd64.tar.gz
-tar -xzf hugo_extended_0.139.0_linux-amd64.tar.gz
-sudo mv hugo /usr/local/bin/
-```
-
-**Or use Docker** (no local Hugo installation needed):
-```bash
-docker run --rm -it -v $(pwd)/hugo-site:/src -p 1313:1313 hugomods/hugo:0.139.4 server --bind 0.0.0.0
-```
-
-### Start Development Server
-
-```bash
-cd hugo-site
-hugo server --bind 0.0.0.0
-```
-
-The site will be available at http://localhost:1313
-
-Hugo will automatically rebuild and reload when you make changes to:
-- Content files in `hugo-site/content/`
-- Layout templates in `hugo-site/layouts/`
-- Static assets in `hugo-site/static/`
-
-### Build Static Site
-
-```bash
-cd hugo-site
-hugo --minify
-```
-
-This generates the production site in `hugo-site/public/`
-
-## Docker Development
-
-### Build the Docker Image
-
-```bash
-docker build -t personal-website .
-```
-
-### Run the Container
-
-**Default (port 8080):**
-```bash
-docker run -p 8080:8080 personal-website
-```
-
-The site will be available at http://localhost:8080
-
-**Custom port:**
-```bash
-docker run -p 3000:3000 \
-  -e PORT="3000" \
-  personal-website
-```
-
-The site will be available at http://localhost:3000
-
-### Run with Custom Configuration
-
-```bash
-docker run -p 9000:9000 \
-  -e PORT="9000" \
-  -e OTEL_EXPORTER_OTLP_ENDPOINT="your-collector:4317" \
-  -e OTEL_SERVICE_NAME="personal-website" \
-  personal-website
-```
-
-## Resume Content
-
-The resume page and the PDF are generated from a single source of truth:
-
-```
-Tyler_North_CV.yaml  →  generate.py  →  hugo-site/content/resume.html
-                                     →  hugo-site/static/Tyler_Daniel_North_CV.pdf
-```
-
-`hugo-site/content/projects.html` is **not** generated — it is
-hand-authored and edited directly.
-
-**To regenerate content after editing the YAML:**
-```bash
-bash scripts/docker-generate.sh
-```
-
-**To keep generated files automatically in sync on every commit:**
-```bash
-pip install pre-commit
-pre-commit install
-# Now editing Tyler_North_CV.yaml and committing will auto-regenerate outputs
-```
-
-CI will fail if `Tyler_North_CV.yaml` is changed without regenerating the output files.
-
-## Project Structure
-
-```
-.
-├── Tyler_North_CV.yaml     # Single source of truth for resume/projects content
-├── generate.py             # Generates resume.html and PDF from YAML
-├── Dockerfile              # Production image (Hugo + Nginx)
-├── Dockerfile.generate     # Image used only for content generation (Python + rendercv)
-├── scripts/
-│   └── docker-generate.sh  # Builds Dockerfile.generate and runs generate.py
-├── hugo-site/              # Hugo website root
-│   ├── content/            # Page content
-│   │   ├── _index.html     # Homepage (hand-authored)
-│   │   ├── resume.html     # Generated from Tyler_North_CV.yaml — do not edit directly
-│   │   └── projects.html   # Hand-authored
-│   ├── layouts/            # Hugo templates
-│   │   ├── _default/
-│   │   │   ├── baseof.html # Base template
-│   │   │   └── single.html # Single page template
-│   │   └── index.html      # Homepage template
-│   ├── static/             # Static assets (CSS, JS, fonts, generated PDF)
-│   ├── hugo.toml           # Hugo configuration
-│   ├── nginx.conf          # Nginx configuration
-│   └── docker-entrypoint.sh # Docker entrypoint script
-├── mkdocs.yml              # Backstage TechDocs site config
-└── docs/
-    ├── README.md           # Symlink to ../README.md (single copy for GitHub + TechDocs)
-    ├── DEVELOPMENT.md      # Local dev, content regen, CI
-    ├── AGENTS.md           # AI agent development guide
-    └── CONTRIBUTING.md     # Canonical-remote statement
-```
+For local development, regenerating the resume, and CI see
+[DEVELOPMENT.md](https://github.com/tnoff/personal-website/blob/main/docs/DEVELOPMENT.md);
+for the repo layout and non-obvious internals see
+[AGENTS.md](https://github.com/tnoff/personal-website/blob/main/docs/AGENTS.md).
 
 ## Features
 
-- **Static Site Generation**: Built with Hugo for fast, efficient static sites
-- **Bootstrap 5**: Responsive design with local Bootstrap assets
-- **Nginx**: Production-ready web server
-- **OpenTelemetry**: Full distributed tracing support with client IP attribution
-- **Real Client IP**: Extracts real client IP from `X-Real-IP` header behind ingress
-- **Health Check**: `/_health/` endpoint for monitoring
-- **Docker**: Single-stage containerized deployment
+- Static site generated by Hugo, Bootstrap 5 layout with local assets
+- Resume page and PDF generated from a single YAML source
+- nginx in a single-stage, non-root image
+- OpenTelemetry tracing with client IP attribution
+- `/_health/` endpoint for probes (not logged or traced)
 
-## Nginx Configuration
+## Nginx configuration
 
-### Real Client IP Forwarding
+### Real client IP forwarding
 
-When deployed behind an ingress controller (e.g., ingress-nginx), the real client IP is extracted from the `X-Real-IP` header. The configuration trusts requests from internal cluster networks:
+Behind ingress-nginx, the real client IP is taken from `X-Real-IP`, trusted
+only from `10.0.0.0/8` and `10.244.0.0/16`. It is used in access logs
+(`$remote_addr`) and added to spans as `http.client_ip`.
 
-- `10.0.0.0/8` - Internal pod network
-- `10.244.0.0/16` - Kubernetes pod CIDR
+### OpenTelemetry tracing
 
-The real client IP is:
-- Used in access logs (`$remote_addr`)
-- Added to trace spans as `http.client_ip` attribute
+Traces are exported over gRPC to the configured collector. Each request span
+carries the standard HTTP attributes plus `http.client_ip`.
 
-### OpenTelemetry Tracing
+## Environment variables
 
-Traces are exported via gRPC to the configured OTEL collector. Each request span includes:
-- Standard HTTP attributes (method, status, path)
-- `http.client_ip` - The real client IP address
+| Variable | Default | Purpose |
+|---|---|---|
+| `PORT` | `8080` | Port nginx listens on |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | `localhost:4317` | OTel collector endpoint |
+| `OTEL_SERVICE_NAME` | `personal-website` | Service name on traces |
+
+`docker-entrypoint.sh` substitutes these into `nginx.conf` at start.
 
 ## Deployment
 
-The site is designed to be deployed via Docker on Kubernetes:
-
-1. Build the Docker image with a version tag
-2. Push to your container registry
-3. Deploy to Kubernetes with appropriate environment variables
-4. Configure environment variables as needed
-
-### Environment Variables
-
-- `PORT` - Port for Nginx to listen on (default: `8080`)
-- `OTEL_EXPORTER_OTLP_ENDPOINT` - OpenTelemetry collector endpoint (default: `localhost:4317`)
-- `OTEL_SERVICE_NAME` - Service name for OpenTelemetry traces (default: `personal-website`)
-
-Example Kubernetes deployment snippet:
-```yaml
-env:
-  - name: PORT
-    value: "8080"
-  - name: OTEL_EXPORTER_OTLP_ENDPOINT
-    value: "otel-collector.monitoring.svc.cluster.local:4317"
-  - name: OTEL_SERVICE_NAME
-    value: "personal-website"
-```
+The manifests live in
+[`tnoff/docker-apps/apps/personal-website/`](https://github.com/tnoff/docker-apps/tree/main/apps/personal-website)
+(two replicas behind ingress-nginx, TLS from cert-manager). On each merge to
+`main` that touches an image input, CI pushes the image to OCIR with a
+short-SHA tag and sends a `repository_dispatch` (`bump_source: personal-website`)
+to docker-apps, whose `bump-image-pin.yml` opens the PR that bumps the pin.
 
 ## License
 
