@@ -63,7 +63,7 @@ jobs:
     name: Scan for secrets
     needs: metadata
     if: needs.metadata.outputs.only != 'true'
-    uses: tnoff/github-workflows/.github/workflows/trufflehog.yml@7d6ac98382ec555ef3520ae1c2f07183c35e5127
+    uses: tnoff/github-workflows/.github/workflows/trufflehog.yml@adea087c43d56fd13d5b1abf2d5f2ba3e695784d  # trufflehog-v1.0.0
 
   # Diff-scoped, not --all-files, and that is a correctness choice rather than a
   # speed one. The generate-resume hook is `pass_filenames: false` with
@@ -85,7 +85,7 @@ jobs:
     name: pre-commit
     needs: metadata
     if: needs.metadata.outputs.only != 'true'
-    uses: tnoff/github-workflows/.github/workflows/pre-commit.yml@7d6ac98382ec555ef3520ae1c2f07183c35e5127
+    uses: tnoff/github-workflows/.github/workflows/pre-commit.yml@adea087c43d56fd13d5b1abf2d5f2ba3e695784d  # pre-commit-v1.0.0
     with:
       all_files: false
 
@@ -93,7 +93,7 @@ jobs:
     name: Spellcheck
     needs: metadata
     if: needs.metadata.outputs.only != 'true'
-    uses: tnoff/github-workflows/.github/workflows/spellcheck.yml@7d6ac98382ec555ef3520ae1c2f07183c35e5127
+    uses: tnoff/github-workflows/.github/workflows/spellcheck.yml@adea087c43d56fd13d5b1abf2d5f2ba3e695784d  # spellcheck-v1.0.0
     with:
       name: html
 
@@ -148,14 +148,14 @@ jobs:
     name: Build and scan image
     needs: changes
     if: needs.changes.outputs.image == 'true'
-    uses: tnoff/github-workflows/.github/workflows/docker-build-check.yml@7d6ac98382ec555ef3520ae1c2f07183c35e5127
+    uses: tnoff/github-workflows/.github/workflows/docker-build-check.yml@adea087c43d56fd13d5b1abf2d5f2ba3e695784d  # docker-build-check-v1.0.0
 
   bump-version:
     name: Bump version
     if: startsWith(github.head_ref, 'renovate/dev-')
     permissions:
       contents: write
-    uses: tnoff/github-workflows/.github/workflows/bump-version.yml@7d6ac98382ec555ef3520ae1c2f07183c35e5127
+    uses: tnoff/github-workflows/.github/workflows/bump-version.yml@adea087c43d56fd13d5b1abf2d5f2ba3e695784d  # bump-version-v1.0.0
     with:
       bump_changelog: true
     secrets:
@@ -171,7 +171,7 @@ jobs:
     name: Workflow contracts
     needs: metadata
     if: needs.metadata.outputs.only != 'true'
-    uses: tnoff/github-workflows/.github/workflows/check-workflow-contracts.yml@7d6ac98382ec555ef3520ae1c2f07183c35e5127
+    uses: tnoff/github-workflows/.github/workflows/check-workflow-contracts.yml@adea087c43d56fd13d5b1abf2d5f2ba3e695784d  # check-workflow-contracts-v1.0.0
 
   result:
     name: CI result
