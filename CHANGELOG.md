@@ -5,6 +5,12 @@ All notable changes to the personal website will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.14] - 2026-11-28
+
+### Changed
+
+- Add a smoke test (`smoke/site-smoke.sh`, baked into the image as `site-smoke`) and a public probe workflow (`smoke-public.yml`) that runs it against tyler-north.com every 15 minutes and checks the certificate. The in-cluster CronJob in docker-apps runs the same script against the Service. Failures go to #smoke-tests.
+
 ## [0.0.13] - 2026-11-24
 
 ### Changed
