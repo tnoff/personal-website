@@ -1,0 +1,1 @@
+Add a smoke test (`smoke/site-smoke.sh`, baked into the image as `site-smoke`) and a public probe workflow (`smoke-public.yml`) that runs it against tyler-north.com every 15 minutes and checks the certificate. The in-cluster CronJob in docker-apps runs the same script against the Service. Failures go to #smoke-tests.

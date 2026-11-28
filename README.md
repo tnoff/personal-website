@@ -49,6 +49,32 @@ The manifests live in
 short-SHA tag and sends a `repository_dispatch` (`bump_source: personal-website`)
 to docker-apps, whose `bump-image-pin.yml` opens the PR that bumps the pin.
 
+## Smoke test
+
+`smoke/site-smoke.sh` asks a running site what a browser would: `/_health/`, the homepage
+and its security header, the resume and projects pages, a stylesheet, the resume PDF (a real
+PDF, not an HTML error page that answers 200), and that a missing page returns 404. It is
+POSIX sh and `wget` only, and is baked into the image as `/usr/local/bin/site-smoke`. It
+prints `PASS` or `FAIL` per check and exits 0 or 1.
+
+```bash
+SMOKE_BASE_URL=https://tyler-north.com sh smoke/site-smoke.sh
+```
+
+It runs in two places, so a failure says which side of the ingress is broken:
+
+- **In the cluster**: the `smoke-personal-website` CronJob in
+  [`tnoff/docker-apps`](https://github.com/tnoff/docker-apps/tree/main/apps/personal-website)
+  runs it with this image against the `website-svc` Service. A pod cannot reach the public
+  URL (ingress-nginx needs PROXY protocol and kube-proxy skips the load balancer), so this
+  covers the site but not DNS, TLS or the ingress.
+- **From GitHub**: `.github/workflows/smoke-public.yml` runs it every 15 minutes against
+  `https://tyler-north.com` and checks the certificate has 14 days left. This walks the whole
+  public path.
+
+Failures post to `#smoke-tests` in Discord. If the public probe fails and the in-cluster one
+passes, look in front of the site (DNS, the load balancer, the ingress, the certificate).
+
 ## License
 
 Personal project - all rights reserved.

@@ -24,6 +24,7 @@ single YAML CV; everything else is hand-authored markdown/HTML.
 │   ├── nginx.conf               # Serves :${PORT}, /_health/ liveness, gzip + headers
 │   └── docker-entrypoint.sh     # envsubst into nginx.conf, then starts nginx
 ├── scripts/docker-generate.sh   # Wrapper that runs generate.py in Docker
+├── smoke/site-smoke.sh          # Smoke test, baked into the image as /usr/local/bin/site-smoke
 ├── Dockerfile                   # nginx (otel build, alpine) + Hugo build
 ├── Dockerfile.generate          # Used by scripts/docker-generate.sh
 ├── mkdocs.yml                   # Backstage TechDocs site config
@@ -71,6 +72,16 @@ probes, each landing in Tempo as its own single-span trace.
 `otel_trace on` is set in the `http` block and inherited by every
 location, so turning it off has to be explicit here. If you add another
 probe-only or machine-only location, turn it off there too.
+
+### The smoke test runs in two places and must work under busybox and GNU wget
+
+`smoke/site-smoke.sh` runs from the image in a docker-apps CronJob (busybox `wget`, against the
+`website-svc` Service) and from `smoke-public.yml` on a GitHub runner (GNU `wget`, against the
+public URL). It requests `/resume/` and `/projects/` WITH the trailing slash on purpose: without
+it nginx answers 301 to `http://tyler-north.com/resume/`, a public host a pod cannot reach, and
+busybox `wget` does not follow the ingress's 308. If you add a page, add a check for it. The
+image-input filter in `ci.yml` and `release.yml` includes `smoke/*`, so a change to the script
+builds and pins a new image.
 
 ### Hugo version pinning is via the Alpine package
 
