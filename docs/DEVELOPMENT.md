@@ -88,6 +88,18 @@ the same image on 8080.
 The image is `nginx:alpine` serving the static output from
 `/usr/share/nginx/html`. Health check endpoint: `GET /_health/`.
 
+## Smoke test
+
+```bash
+shellcheck smoke/site-smoke.sh
+SMOKE_BASE_URL=https://tyler-north.com sh smoke/site-smoke.sh        # GNU wget
+docker run --rm -v "$PWD/smoke:/s:ro" -e SMOKE_BASE_URL=https://tyler-north.com alpine:3.22 sh /s/site-smoke.sh   # busybox wget, as in the image
+```
+
+The script must run under both: the image has busybox `wget` and the GitHub runner has GNU
+`wget`. Keep it POSIX sh and avoid GNU-only flags (busybox `sed` has no `I` flag, and busybox
+`wget` does not follow a 308).
+
 ## CI / release
 
 CI is GitHub Actions, calling reusable workflows from
@@ -103,6 +115,9 @@ CI is GitHub Actions, calling reusable workflows from
   GitHub OIDC identity, no stored OCIR credential), then
   `trigger-bump-dispatch.yml`, which sends a `repository_dispatch` to
   docker-apps to open the image-pin bump PR.
+- `smoke-public.yml` (every 15 minutes): runs `smoke/site-smoke.sh` against
+  https://tyler-north.com from a GitHub runner, checks the certificate, and posts to
+  `#smoke-tests` on failure. See the Smoke test section of [README.md](README.md).
 - `scheduled.yml`: `renovate.yml`, `branch-cleanup.yml`
 - `notify-failure.yml`: `discord-notify.yml`
 - `techdocs-publish.yml`: publishes this site to Backstage TechDocs when

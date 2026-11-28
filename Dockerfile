@@ -16,6 +16,11 @@ COPY hugo-site/nginx.conf /etc/nginx/nginx.conf
 COPY hugo-site/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
+# Smoke test, run by the CronJob in tnoff/docker-apps (apps/personal-website/smoke-cronjob.yaml) with
+# this image, so the test that runs is always the one written for the site that is deployed
+COPY smoke/site-smoke.sh /usr/local/bin/site-smoke
+RUN chmod 0555 /usr/local/bin/site-smoke
+
 # Set up permissions for non-root user
 RUN chown -R nginx:nginx /usr/share/nginx/html \
     && chown -R nginx:nginx /var/cache/nginx \
